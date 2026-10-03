@@ -46,13 +46,18 @@ Measured on macOS, Apple M1 Pro (8 CPU cores), Node 26.3.1. These are developmen
 | JavaScript and CSS, combined gzip | 145.6 KiB | 250 KiB |
 | 200 summaries from 2,000 active cards, 100 warm reads | 2.82 ms p95; 2.09 ms median | 50 ms p95 |
 | Largest measured summary page | 105,570 bytes | 128 KiB for this fixture |
-| Fresh process to first empty-board result, 12 processes | 244.35 ms p95 | 1 second |
-| Server RSS immediately after first empty-board result | 85.81 MiB maximum observed | 96 MiB |
+| Fresh process to first empty-board result, 12 processes | 144.84 ms p95 | 1 second |
+| Server RSS immediately after first empty-board result | 77.64 MiB maximum observed | 96 MiB |
+| 500 active / 5,000 archived, 20 callers across 4 processes | Reads 4.22 ms p95; edits 0.63 ms p95 | 25 ms reads / 50 ms writes |
+| 2,000 active, 20 callers across 4 processes | Reads 4.76 ms p95; edits 0.24 ms p95 | 25 ms reads / 50 ms writes |
+| 100 competing claim requests across 4 processes | 1 winner; 99 already-claimed failures | Exactly 1 owner |
+| Packaged stdio reads, 2,000 active / 5,000 archived, 30 responses | 5.43 ms p95; 90.97 MiB maximum sampled RSS | 1 second / 96 MiB |
+| 200-card page, Chromium 153, 4× CPU throttle, 20 renders | Data-ready to useful paint 381 ms p95 | 1 second |
 | Idle browser requests over the test observation window | 0 | 0 |
 
 SQLite statements are reused; board ordering has a supporting index; project counts use a covering index; summaries batch ownership/prerequisite reads and exclude full descriptions/criteria. Reads use one consistent SQLite snapshot. UI and server are self-contained bundles.
 
-Not yet measured: native host bridge latency, UI rendering under 4× CPU throttling, 20 simultaneous callers, 100-way claim contention, memory after a large populated board, or the combined 500-active/5,000-archived workload. Current claim correctness evidence uses six independent processes. Do not describe the long-term performance matrix as passed.
+Concurrent storage timings include SQLite lock contention but exclude IPC and host overhead. Twenty logical callers share four processes, each serializing its own calls; this does not simulate twenty desktop MCP processes. The browser fixture consumes preview JSON before timing card DOM commit plus two animation frames, excluding native bridge and initial script loading. Its longest observed task was 286 ms; this test does not establish smooth sustained interaction. Populated RSS is sampled after each response, excluding exports. The native host bridge, sustained memory, Windows, and the complete long-term performance matrix remain unvalidated.
 
 ## Release contents and verification
 
@@ -61,7 +66,7 @@ Not yet measured: native host bridge latency, UI rendering under 4× CPU throttl
 - Stable retry IDs for creation and launch; failed saves preserve drafts. A successfully saved action followed by a failed refresh remains reported as saved.
 - A checksummed ZIP with a portable local marketplace, workflow skill, icons, license/third-party notices, README/privacy guidance, and a Node installer. No end-user npm install or build.
 - Installer checks file hashes, discovers Node, pins the executable for desktop startup, and copies files to a stable marked installation directory. Task data remains outside the plugin cache.
-- Ten storage/protocol tests, five browser workflow tests, isolated clean installation/reinstall checks, a screenshot fixture, size checks, performance benchmarks, and a production dependency audit (zero reported vulnerabilities).
+- Ten storage/protocol tests, five browser workflow tests, a throttled browser performance fixture, isolated clean installation/reinstall checks, screenshots, size checks, concurrent/populated performance benchmarks, and a production dependency audit (zero reported vulnerabilities).
 - CI passed on Linux with Node 22.13 and 24 for code commit `17378ae`: type checking, build, storage/protocol tests, browser workflows, benchmarks, audit, packaging, and clean CLI installation. Evidence: https://github.com/vrnrn/Threadboard/actions/runs/37156379133. Windows and actual native desktop surfaces are not yet validated.
 
 ## Work log
@@ -72,3 +77,6 @@ Not yet measured: native host bridge latency, UI rendering under 4× CPU throttl
 - Published the public source at https://github.com/vrnrn/Threadboard. Publishing a checksummed GitHub preview is separate from the still-pending native host smoke test and from any OpenAI universal-directory submission.
 - Published https://github.com/vrnrn/Threadboard/releases/tag/v0.1.0 as a prerelease, with a 490,596-byte ZIP and SHA256SUMS. Anonymous download and all 16 internal file checksums passed. ZIP SHA-256: `734a318df961789a32f961ada4b19d0a72d88d14514eb8d448245b16ac0aeab5`.
 - Independently installed the public GitHub marketplace at tag `v0.1.0` in a fresh isolated Codex configuration and executed its cached MCP server with the portable `node` configuration. No npm installation or build was needed for that consumer check.
+- Prepared patch 0.1.1: moved trusted static OpenAI UI metadata validation out of production startup into type checking and the packaged protocol test. This removes unused runtime schema initialization while preserving the metadata contract, and brings populated RSS below the existing 96 MiB budget.
+- A negative packaged-protocol test exposed MCP's raw-shape registration silently stripping unknown fields. Registering the full strict schemas now rejects unsupported read/write arguments before any side effect. All 18 advertised schemas prohibit additional properties.
+- Added reproducible concurrency, populated-runtime, and throttled-browser benchmarks to CI. A browser test now waits for the cleared note composer before locating its saved note, removing a transient ambiguous locator.

@@ -45,6 +45,7 @@ test('create, edit, note, move, archive and restore survive a reload', async ({ 
     await expect(detail.getByRole('button', { name: 'Save changes', exact: true })).toBeDisabled();
     await detail.getByRole('textbox', { name: 'Add a note', exact: true }).fill('Keep the first step small.');
     await detail.getByRole('button', { name: 'Add note', exact: true }).click();
+    await expect(detail.getByRole('textbox', { name: 'Add a note', exact: true })).toHaveValue('');
     await expect(detail.getByText('Keep the first step small.', { exact: true })).toBeVisible();
     await detail.getByRole('combobox', { name: 'Task column', exact: true }).selectOption('ready');
     await expect(detail.getByRole('combobox', { name: 'Task column', exact: true })).toHaveValue('ready');

@@ -1,5 +1,6 @@
 import { App } from '@modelcontextprotocol/ext-apps';
 import type { InitialData, Project, Task } from '../types.js';
+import { VERSION } from '../version.js';
 
 declare global { interface Window { __THREADBOARD_PREVIEW__?: string; } }
 let app: App | undefined;
@@ -18,7 +19,7 @@ function dataFrom(result: any) {
 async function connect(onTheme: (theme: string) => void) {
   if (window.__THREADBOARD_PREVIEW__) { onTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); return; }
   if (!connection) {
-    app = new App({ name: 'Threadboard', version: '0.1.0' }, {});
+    app = new App({ name: 'Threadboard', version: VERSION }, {});
     app.ontoolresult = params => {
       const data = dataFrom(params);
       if (data && 'projects' in data && 'board' in data) { initial = data; receiveInitial?.(data); }

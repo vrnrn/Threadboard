@@ -1,8 +1,6 @@
 [
-  "@cfworker/json-schema",
   "@modelcontextprotocol/ext-apps",
   "@modelcontextprotocol/sdk",
-  "@openai/mcp-extensions",
   "ajv",
   "ajv-formats",
   "fast-deep-equal",

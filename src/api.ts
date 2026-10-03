@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { randomUUID } from 'node:crypto';
 import { Store } from './store.js';
 import { BoardError, PRIORITIES, STATUSES, type InitialData } from './types.js';
+import { VERSION } from './version.js';
 
 const id = z.string().uuid();
 const token = z.string().min(32).max(200);
@@ -45,7 +46,7 @@ export function invoke(store: Store, name: string, raw: unknown): any {
         args.projectId = registered.id;
       }
       const projects = store.projects();
-      return { projects, board: args.projectId ? store.board(args.projectId) : projects.length === 1 ? store.board(projects[0].id) : null, version: '0.1.0' } satisfies InitialData;
+      return { projects, board: args.projectId ? store.board(args.projectId) : projects.length === 1 ? store.board(projects[0].id) : null, version: VERSION } satisfies InitialData;
     }
     case 'list_projects': return { projects: store.projects() };
     case 'create_project': return { project: store.createProject(args.name, args.root) };

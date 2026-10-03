@@ -4,6 +4,7 @@ import { dirname, join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 const root = new URL('../', import.meta.url);
+const { version } = JSON.parse(await readFile(new URL('package.json', root), 'utf8'));
 const output = new URL('plugins/threadboard/dist/', root);
 await mkdir(output, { recursive: true });
 const ui = await build({ entryPoints: [fileURLToPath(new URL('src/ui/main.tsx', root))], bundle: true, minify: true,
@@ -43,6 +44,6 @@ for (const name of [...packages].sort()) {
 await writeFile(new URL('THIRD_PARTY_NOTICES.md', root), notices);
 await writeFile(new URL('bundle-packages.json', output), JSON.stringify([...packages].sort(), null, 2) + '\n');
 const uiSize = gzipSync(Buffer.from(js + css)).length;
-await writeFile(new URL('build-info.json', output), JSON.stringify({ version: '0.1.0', uiGzipBytes: uiSize, htmlBytes: Buffer.byteLength(html), runtime: 'Node >=22.13' }, null, 2) + '\n');
+await writeFile(new URL('build-info.json', output), JSON.stringify({ version, uiGzipBytes: uiSize, htmlBytes: Buffer.byteLength(html), runtime: 'Node >=22.13' }, null, 2) + '\n');
 console.log(`Built local plugin: UI ${(uiSize / 1024).toFixed(1)} KiB gzip; all assets bundled.`);
 if (uiSize > 250 * 1024) throw new Error('UI exceeds the 250 KiB gzip performance budget.');

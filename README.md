@@ -12,8 +12,8 @@ Threadboard is a Codex desktop plugin with a bundled MCP server and board interf
 
 You need a Codex desktop version that supports MCP Apps/plugin extension entrypoints, the Codex CLI on your PATH, and **Node.js 22.13 or newer**. Node 24 LTS or newer is recommended. The package contains compiled assets; npm and a build step are unnecessary.
 
-1. Download `threadboard-0.1.0.zip` from [GitHub Releases](https://github.com/vrnrn/Threadboard/releases). Optionally verify it against the adjacent `SHA256SUMS` file.
-2. Extract the archive. Open a terminal in the extracted `threadboard-0.1.0` directory.
+1. Download `threadboard-0.1.1.zip` from [GitHub Releases](https://github.com/vrnrn/Threadboard/releases). Optionally verify it against the adjacent `SHA256SUMS` file.
+2. Extract the archive. Open a terminal in the extracted `threadboard-0.1.1` directory.
 3. Run:
 
    ```sh
@@ -28,7 +28,7 @@ The installer verifies packaged files, copies the plugin to a stable application
 For a repository marketplace instead of the downloadable installer:
 
 ```sh
-codex plugin marketplace add vrnrn/Threadboard --ref v0.1.0
+codex plugin marketplace add vrnrn/Threadboard --ref v0.1.1
 codex plugin add threadboard@threadboard-plugins
 ```
 
@@ -84,6 +84,9 @@ npm run test:ui
 npm run screenshots
 npm run benchmark
 npm run benchmark:startup
+npm run benchmark:concurrency
+npm run benchmark:populated
+npm run benchmark:ui
 npm run release:check
 npm run release:pack
 npm run test:install

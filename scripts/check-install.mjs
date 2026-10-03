@@ -19,8 +19,11 @@ const run = (command, args) => {
 };
 const find = (directory, filename) => readdirSync(directory, { withFileTypes: true }).flatMap(entry => entry.isDirectory() ? find(join(directory, entry.name), filename) : entry.name === filename ? [join(directory, entry.name)] : []);
 let client;
-const cachedTransport = () => {
-  const cached = find(join(configDirectory, 'plugins', 'cache'), 'server.mjs');
+const cachedTransport = (expectedVersion = version) => {
+  const cached = find(join(configDirectory, 'plugins', 'cache'), 'server.mjs').filter(path => {
+    const manifest = JSON.parse(readFileSync(join(dirname(dirname(path)), '.codex-plugin', 'plugin.json'), 'utf8'));
+    return manifest.version === expectedVersion;
+  });
   assert.equal(cached.length, 1, 'The installed cache must contain the bundled server.');
   const pluginRoot = dirname(dirname(cached[0]));
   const config = JSON.parse(readFileSync(join(pluginRoot, '.mcp.json'), 'utf8')).mcpServers.threadboard;
@@ -31,9 +34,12 @@ try {
   mkdirSync(configDirectory, { recursive: true }); mkdirSync(data);
   const sentinel = join(data, 'update-preserves-data.txt'); writeFileSync(sentinel, 'Task data stays outside the plugin cache.');
   const installer = join(root, 'release', `threadboard-${version}`, 'install.mjs');
-  console.log(run(process.execPath, [installer]).split('\n')[0]);
-  const transport = cachedTransport();
+  const initialRelease = process.env.THREADBOARD_PREVIOUS_RELEASE;
+  const initialVersion = initialRelease ? JSON.parse(readFileSync(join(initialRelease, 'MANIFEST.json'), 'utf8')).version : version;
+  console.log(run(process.execPath, [initialRelease ? join(initialRelease, 'install.mjs') : installer]).split('\n')[0]);
+  const transport = cachedTransport(initialVersion);
   client = new Client({ name: 'installed-package-check', version: '1.0' }); await client.connect(transport);
+  assert.equal(client.getServerVersion().version, initialVersion);
   const result = await client.callTool({ name: 'create_project', arguments: { name: 'Installed package', root: temporary } });
   assert.equal(result.isError, undefined);
   const projectId = result.structuredContent.project.id;
@@ -44,7 +50,8 @@ try {
   assert.equal(readFileSync(sentinel, 'utf8'), 'Task data stays outside the plugin cache.');
   client = new Client({ name: 'update-package-check', version: '1.0' });
   await client.connect(cachedTransport());
+  assert.equal(client.getServerVersion().version, version);
   const restored = await client.callTool({ name: 'get_task', arguments: { projectId, taskId } });
   assert.equal(restored.structuredContent.task.title, 'Survive a plugin update');
-  console.log('Clean Codex installation, cached MCP execution, reinstall, and task persistence passed.');
+  console.log(`Clean Codex installation, cached MCP execution, ${initialVersion} to ${version}, and task persistence passed.`);
 } finally { if (client) await client.close(); rmSync(temporary, { recursive: true, force: true }); }

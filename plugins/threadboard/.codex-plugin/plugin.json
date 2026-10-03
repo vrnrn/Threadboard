@@ -1,8 +1,10 @@
 {
   "name": "threadboard",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A fully local Kanban board inside Codex. Create tasks, coordinate chats, and review completed work without a hosted service.",
-  "author": { "name": "Threadboard contributors" },
+  "author": {
+    "name": "Threadboard contributors"
+  },
   "license": "MIT",
   "mcpServers": "./.mcp.json",
   "skills": "./skills/",
@@ -12,7 +14,11 @@
     "longDescription": "Keep your work in a local project board beside your Codex chats. Plan tasks, claim ownership, launch workspace chats, write progress notes, and review results. Data stays on your machine. Node.js 22.13 or newer is required. New-chat links prefill a task prompt for you to send.",
     "developerName": "Threadboard contributors",
     "category": "Productivity",
-    "capabilities": ["Local task boards", "Chat coordination", "Review workflow"],
+    "capabilities": [
+      "Local task boards",
+      "Chat coordination",
+      "Review workflow"
+    ],
     "websiteURL": "https://github.com/vrnrn/Threadboard",
     "supportURL": "https://github.com/vrnrn/Threadboard/issues",
     "privacyPolicyURL": "https://github.com/vrnrn/Threadboard/blob/main/PRIVACY.md",
