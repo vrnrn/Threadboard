@@ -1,6 +1,6 @@
 # Threadboard prototype
 
-Status: GitHub local preview published; native host validation pending · 3 October 2026
+Status: GitHub local preview 0.1.1 published; native host validation pending · 3 October 2026
 
 ## Release scope
 
@@ -81,3 +81,4 @@ Concurrent storage timings include SQLite lock contention but exclude IPC and ho
 - A negative packaged-protocol test exposed MCP's raw-shape registration silently stripping unknown fields. Registering the full strict schemas now rejects unsupported read/write arguments before any side effect. All 18 advertised schemas prohibit additional properties.
 - Added reproducible concurrency, populated-runtime, and throttled-browser benchmarks to CI. A browser test now waits for the cleared note composer before locating its saved note, removing a transient ambiguous locator.
 - Patch code `8c9d884` passed the full Linux CI matrix on Node 22.13 and 24, including all expanded benchmarks and installation checks: https://github.com/vrnrn/Threadboard/actions/runs/37157648470. A separate local 0.1.0 → 0.1.1 installer upgrade preserved a saved task and reported the new server version. The actual development installation was upgraded and its cached server hash verified. All protected planning documents still match their original hashes.
+- Published https://github.com/vrnrn/Threadboard/releases/tag/v0.1.1 with a 424,399-byte ZIP. Anonymous download matched the local audited package and all 16 internal checksums. ZIP SHA-256: `24a2666b5b599769236b3530012a31e50b5f1bd7e8939230edb68c2138d2d4fe`. The two native host gates remain open: GUI automation is denied and the MCP Apps panel inventory is empty. Further host verification requires the user to open the installed plugin; no other release gate remains pending for this preview.
