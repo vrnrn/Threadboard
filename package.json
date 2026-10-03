@@ -1,0 +1,40 @@
+{
+  "name": "threadboard",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A fully local Kanban board inside Codex.",
+  "license": "MIT",
+  "engines": { "node": ">=22.13.0" },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts",
+    "test:ui": "playwright test",
+    "screenshots": "playwright test --config playwright.screenshots.config.ts",
+    "dev": "tsx src/preview.ts",
+    "benchmark": "tsx scripts/benchmark.ts",
+    "benchmark:startup": "node scripts/benchmark-startup.mjs",
+    "release:check": "node scripts/release-check.mjs",
+    "release:pack": "node scripts/release.mjs",
+    "test:install": "node scripts/check-install.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/ext-apps": "1.7.5",
+    "@modelcontextprotocol/sdk": "1.32.0",
+    "@openai/mcp-extensions": "0.1.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "zod": "^3.25.76",
+    "lucide-react": "^0.577.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@types/node": "^22.19.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "esbuild": "^0.25.12",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

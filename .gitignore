@@ -1,0 +1,13 @@
+node_modules/
+.DS_Store
+test-results/
+playwright-report/
+release/
+.preview-data/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.log
+.env
+.env.*
+coverage/

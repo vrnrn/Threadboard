@@ -1,0 +1,17 @@
+[
+  "@cfworker/json-schema",
+  "@modelcontextprotocol/ext-apps",
+  "@modelcontextprotocol/sdk",
+  "@openai/mcp-extensions",
+  "ajv",
+  "ajv-formats",
+  "fast-deep-equal",
+  "fast-uri",
+  "json-schema-traverse",
+  "lucide-react",
+  "react",
+  "react-dom",
+  "scheduler",
+  "zod",
+  "zod-to-json-schema"
+]

@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "threadboard": {
+      "command": "node",
+      "args": ["./dist/server.mjs"],
+      "cwd": "."
+    }
+  }
+}
