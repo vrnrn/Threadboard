@@ -22,7 +22,7 @@ The first release is a fully local Codex plugin, distributed as a complete GitHu
 - [ ] Card launch opens a Codex chat in the intended workspace; task binding and chat navigation have real host evidence.
 - [x] Browser UI interaction, keyboard focus, conflict recovery, small screens, light/dark rendering, text escaping, and zero idle polling/remote assets.
 - [x] Packaged release installs into a clean Codex configuration and preserves task data through reinstall. Installed-cache execution uses the packaged MCP configuration and discovered Node path.
-- [x] Automated source/bundle audit finds no credentials, personal workspace paths, user data, or transcripts. Final Git history and public download audit still pending.
+- [x] Automated source/bundle audit finds no credentials, personal workspace paths, user data, or transcripts. The repository starts from the audited source with a GitHub noreply commit address; no prior private history was imported. Public download verification is the remaining artifact check.
 - [ ] GitHub repository/release and downloadable checksummed artifact are available, with exact install instructions.
 - [x] Original long-term documents remain byte-for-byte unchanged, checked against SHA-256 baselines during every release audit.
 
@@ -62,10 +62,11 @@ Not yet measured: native host bridge latency, UI rendering under 4× CPU throttl
 - A checksummed ZIP with a portable local marketplace, workflow skill, icons, license/third-party notices, README/privacy guidance, and a Node installer. No end-user npm install or build.
 - Installer checks file hashes, discovers Node, pins the executable for desktop startup, and copies files to a stable marked installation directory. Task data remains outside the plugin cache.
 - Ten storage/protocol tests, five browser workflow tests, isolated clean installation/reinstall checks, a screenshot fixture, size checks, performance benchmarks, and a production dependency audit (zero reported vulnerabilities).
-- CI targets Linux with Node 22.13 and 24. CI results are pending publication. Windows and actual native desktop surfaces are not yet validated.
+- CI passed on Linux with Node 22.13 and 24 for code commit `17378ae`: type checking, build, storage/protocol tests, browser workflows, benchmarks, audit, packaging, and clean CLI installation. Evidence: https://github.com/vrnrn/Threadboard/actions/runs/37156379133. Windows and actual native desktop surfaces are not yet validated.
 
 ## Work log
 
 - Created this note file before implementation. Recorded the fully local release pivot without modifying the long-term documents.
 - Built the core, embedded UI, workflow skill, downloadable installer, package checks, and tests. Found and fixed a post-save UI error, stale draft reload behavior, a primary-button hover contrast issue, and incomplete note exports during verification.
 - Reduced the original 68.7 ms p95 board-read result to 2.82 ms using query/index changes. Original planning documents remain unchanged.
+- Published the public source at https://github.com/vrnrn/Threadboard. Publishing a checksummed GitHub preview is separate from the still-pending native host smoke test and from any OpenAI universal-directory submission.
