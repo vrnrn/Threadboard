@@ -1,6 +1,6 @@
 # Threadboard prototype
 
-Status: packaged local preview; native host validation pending · 3 October 2026
+Status: GitHub local preview published; native host validation pending · 3 October 2026
 
 ## Release scope
 
@@ -22,8 +22,8 @@ The first release is a fully local Codex plugin, distributed as a complete GitHu
 - [ ] Card launch opens a Codex chat in the intended workspace; task binding and chat navigation have real host evidence.
 - [x] Browser UI interaction, keyboard focus, conflict recovery, small screens, light/dark rendering, text escaping, and zero idle polling/remote assets.
 - [x] Packaged release installs into a clean Codex configuration and preserves task data through reinstall. Installed-cache execution uses the packaged MCP configuration and discovered Node path.
-- [x] Automated source/bundle audit finds no credentials, personal workspace paths, user data, or transcripts. The repository starts from the audited source with a GitHub noreply commit address; no prior private history was imported. Public download verification is the remaining artifact check.
-- [ ] GitHub repository/release and downloadable checksummed artifact are available, with exact install instructions.
+- [x] Automated source/bundle audit finds no credentials, personal workspace paths, user data, or transcripts. The repository starts from the audited source with a GitHub noreply commit address; no prior private history was imported. Anonymous public download matches the audited artifact and its checksums.
+- [x] GitHub repository/release and downloadable checksummed artifact are available, with exact install instructions.
 - [x] Original long-term documents remain byte-for-byte unchanged, checked against SHA-256 baselines during every release audit.
 
 ## Current findings
@@ -70,3 +70,5 @@ Not yet measured: native host bridge latency, UI rendering under 4× CPU throttl
 - Built the core, embedded UI, workflow skill, downloadable installer, package checks, and tests. Found and fixed a post-save UI error, stale draft reload behavior, a primary-button hover contrast issue, and incomplete note exports during verification.
 - Reduced the original 68.7 ms p95 board-read result to 2.82 ms using query/index changes. Original planning documents remain unchanged.
 - Published the public source at https://github.com/vrnrn/Threadboard. Publishing a checksummed GitHub preview is separate from the still-pending native host smoke test and from any OpenAI universal-directory submission.
+- Published https://github.com/vrnrn/Threadboard/releases/tag/v0.1.0 as a prerelease, with a 490,596-byte ZIP and SHA256SUMS. Anonymous download and all 16 internal file checksums passed. ZIP SHA-256: `734a318df961789a32f961ada4b19d0a72d88d14514eb8d448245b16ac0aeab5`.
+- Independently installed the public GitHub marketplace at tag `v0.1.0` in a fresh isolated Codex configuration and executed its cached MCP server with the portable `node` configuration. No npm installation or build was needed for that consumer check.
