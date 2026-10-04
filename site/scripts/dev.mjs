@@ -15,19 +15,21 @@ const types = {
   ".txt": "text/plain",
   ".xml": "application/xml",
 };
-const globalHeaders = Object.fromEntries(
-  readFileSync(resolve(root, "_headers"), "utf8")
-    .split("\n")
-    .slice(1)
-    .filter(
-      (line) =>
-        line.startsWith("  ") && !line.trim().startsWith("Cache-Control:"),
-    )
-    .map((line) => {
-      const colon = line.indexOf(":");
-      return [line.slice(0, colon).trim(), line.slice(colon + 1).trim()];
-    }),
-);
+// Rebuilds change inline-script hashes; read headers with each served response.
+const globalHeaders = () =>
+  Object.fromEntries(
+    readFileSync(resolve(root, "_headers"), "utf8")
+      .split("\n")
+      .slice(1)
+      .filter(
+        (line) =>
+          line.startsWith("  ") && !line.trim().startsWith("Cache-Control:"),
+      )
+      .map((line) => {
+        const colon = line.indexOf(":");
+        return [line.slice(0, colon).trim(), line.slice(colon + 1).trim()];
+      }),
+  );
 const port = Number(process.env.THREADBOARD_SITE_PORT || 4400);
 const server = createServer((request, response) => {
   try {
@@ -42,7 +44,7 @@ const server = createServer((request, response) => {
     )
       throw new Error("Not found");
     response.writeHead(200, {
-      ...globalHeaders,
+      ...globalHeaders(),
       "Content-Type": types[extname(path)] || "application/octet-stream",
       "Cache-Control": "no-store",
     });
