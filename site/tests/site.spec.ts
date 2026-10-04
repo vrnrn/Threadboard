@@ -1,6 +1,26 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { createHash } from "node:crypto";
+test("returning visitors bypass old unversioned styles and demo assets", async ({ page }) => {
+  const staleRequests: string[] = [];
+  await page.route("**/*", async route => {
+    const url = new URL(route.request().url());
+    const stale = ["/styles.css", "/main.js", "/demo/", "/demo/app.js", "/demo/app.css", "/demo/demo.css"];
+    if (stale.includes(url.pathname) && !url.searchParams.has("v")) {
+      staleRequests.push(url.pathname);
+      await route.fulfill({ status: 410, body: "Old cached asset" });
+    } else await route.continue();
+  });
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: "Task boards. Inside Codex." })).toBeVisible();
+  await page.getByRole("button", { name: "Switch to light mode" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await page.getByRole("button", { name: "Reset demo board" }).click();
+  const app = page.frameLocator("#app-demo");
+  await expect(app.getByRole("heading", { name: "Guide users through their first task" })).toBeVisible();
+  expect(staleRequests).toEqual([]);
+});
+
 test("dark is the default; theme choice and product images survive navigation", async ({
   page,
 }) => {
@@ -49,7 +69,7 @@ test("the example handoff supports pointer and keyboard; screenshot dialog retur
   await expect(page.getByRole("dialog")).toBeVisible();
   await expect(page.locator("#large-image")).toHaveAttribute(
     "src",
-    "/assets/task-review-dark.png",
+    /\/assets\/task-review-dark\.png\?v=[a-f0-9]{12}$/,
   );
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog")).not.toBeVisible();

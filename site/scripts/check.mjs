@@ -25,7 +25,8 @@ for (const match of html.matchAll(/\b(?:href|src)="([^"]+)"/g)) {
     assert.ok(ids.has(reference.slice(1)), `Missing anchor ${reference}`);
     continue;
   }
-  const path = reference === "/" ? "/index.html" : reference;
+  const pathname = new URL(reference, "https://threadboard.vrnrn.com").pathname;
+  const path = pathname === "/" ? "/index.html" : pathname;
   assert.ok(
     existsSync(resolve(output, `.${path}`)),
     `Missing asset: ${reference}`,

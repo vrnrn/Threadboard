@@ -1,4 +1,6 @@
 const root = document.documentElement;
+const assetVersion = root.dataset.assetVersion;
+const demoSource = () => `/demo/?theme=${root.dataset.theme}&v=${assetVersion}`;
 const announcement = document.querySelector("#announcement");
 const themeToggle = document.querySelector(".theme-toggle");
 const screenshotNames = {
@@ -17,10 +19,10 @@ function applyTheme(theme) {
     theme === "dark" ? "#181818" : "#f7f5f0";
   for (const image of document.querySelectorAll("[data-theme-image]"))
     image.src = imageSource(image.dataset.themeImage);
-  document.querySelector("[data-open-demo]").href = `/demo/?theme=${theme}`;
+  document.querySelector("[data-open-demo]").href = demoSource();
 }
 function imageSource(name) {
-  return `/assets/${name}${root.dataset.theme === "dark" ? "-dark" : ""}.png`;
+  return `/assets/${name}${root.dataset.theme === "dark" ? "-dark" : ""}.png?v=${assetVersion}`;
 }
 applyTheme(root.dataset.theme);
 themeToggle.addEventListener("click", () => {
@@ -164,8 +166,7 @@ imageDialog.addEventListener("close", () => {
   imageTrigger?.focus();
 });
 document.querySelector("[data-reset-demo]").addEventListener("click", () => {
-  document.querySelector("#app-demo").src =
-    `/demo/?theme=${root.dataset.theme}`;
+  document.querySelector("#app-demo").src = demoSource();
   announcement.textContent = "Demo board reset to its example projects.";
 });
 window.addEventListener("message", (event) => {
