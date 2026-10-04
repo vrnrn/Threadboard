@@ -61,5 +61,6 @@ try {
   console.log(`Threadboard ${manifest.version} installed. Close the Threadboard panel, fully quit Codex, then reopen it and open Threadboard from your installed plugins.\nPlugin files: ${target}\nTask data is stored separately and survives plugin updates.`);
 } catch (error) {
   if (existsSync(backup)) { if (existsSync(target)) rmSync(target, { recursive: true, force: true }); renameSync(backup, target); }
-  fail(`Installation did not complete: ${error.message}\nYour task database was not changed. Resolve the CLI error and rerun the installer.`);
+  process.exitCode = 1;
+  console.error(`Threadboard: Installation did not complete: ${error.message}\nYour task database was not changed. Resolve the CLI error and rerun the installer.`);
 } finally { if (existsSync(stage)) rmSync(stage, { recursive: true, force: true }); }

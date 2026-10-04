@@ -1,64 +1,59 @@
-<img src="docs/images/cover-dark.svg#gh-dark-mode-only" alt="Threadboard — Give every task a home. Local boards for your Codex projects." width="1200">
-<img src="docs/images/cover.svg#gh-light-mode-only" alt="Threadboard — Give every task a home. Local boards for your Codex projects." width="1200">
+<img src="docs/images/cover-dark.svg#gh-dark-mode-only" alt="Threadboard — Task boards inside Codex" width="1200">
+<img src="docs/images/cover.svg#gh-light-mode-only" alt="Threadboard — Task boards inside Codex" width="1200">
 
-Plan work across your Codex projects, give each task a chat, and bring the result back for review. Threadboard keeps your boards on your device and opens inside Codex.
+Threadboard adds local task boards to Codex. Plan work in your existing projects, assign cards to chats, and review the results before marking them Done.
 
-[Product page and preview download](https://threadboard.vrnrn.com/) · **Current source preview: `0.1.4-dev.6`** · [Installation](#install-the-current-preview) · [User guide](docs/usage.md) · [Development](docs/development.md) · [MIT license](LICENSE)
+[Website and interactive demo](https://threadboard.vrnrn.com/) · [Install](#install-the-current-preview) · [User guide](docs/usage.md) · [Development](docs/development.md) · [Release notes](RELEASE_NOTES.md)
 
 <img src="docs/images/board-dark.png#gh-dark-mode-only" alt="Orbit's Product board, with tasks across Backlog, Ready, In progress, Review, and Done" width="1512">
 <img src="docs/images/board.png#gh-light-mode-only" alt="Orbit's Product board, with tasks across Backlog, Ready, In progress, Review, and Done" width="1512">
 
-## From plan to review
+## What it does
 
-- **Your Codex projects.** Existing local projects appear automatically, each with an empty General board. Create and manage projects in Codex.
-- **Room for more than one board.** Organize a project into named boards such as Product, Release, and Editorial. The overview shows every board and its task counts.
-- **Work shared across chats.** Pick up a card in an existing chat or start a new chat from it. Atomic ownership keeps one chat responsible for the work.
-- **Results come back for review.** Read deliberate progress notes, review the result, and explicitly accept it into Done or request changes.
-- **Lightweight live updates.** Visible boards check a small local revision once per second and reload only after changes. Hidden panels pause; open drafts are preserved.
-- **A familiar surface.** The board follows Codex's theme and font settings, supports keyboard navigation, and adapts to narrower panels.
+- **Uses your Codex projects.** Each gets a General board. Add named boards for features, releases, or other work.
+- **Connects tasks to chats.** Start a new chat from a card or ask an existing chat to claim it. One chat owns a task at a time.
+- **Keeps the result on the card.** Chats add progress notes and submit work to Review. You accept it into Done or request changes.
+- **Updates as you work.** Visible boards check for local changes. Hidden panels pause, and refreshes preserve open drafts.
+- **Fits inside Codex.** Host themes, keyboard controls, and layouts for narrow panels are supported.
 
-Task content stays in a local SQLite database. The plugin uses a bundled stdio MCP server, with no hosted backend or transcript synchronization. Using task information in Codex still uses your normal Codex account and model allowance. [Privacy details](PRIVACY.md).
+Boards live in a local SQLite database. The plugin has no hosted backend, telemetry, or transcript access. Task information used in a chat goes through your normal Codex account and model service. [Privacy details](PRIVACY.md).
 
 <table>
   <tr>
-    <td width="50%" valign="top"><strong>Every project, every board</strong><br><br><img src="docs/images/overview-dark.png#gh-dark-mode-only" alt="The Your boards overview groups General, Product, Release, and Editorial boards by project"><img src="docs/images/overview.png#gh-light-mode-only" alt="The Your boards overview groups General, Product, Release, and Editorial boards by project"></td>
-    <td width="50%" valign="top"><strong>Review, then move forward</strong><br><br><img src="docs/images/task-review-dark.png#gh-dark-mode-only" alt="A task in Review with its goal, acceptance criteria, owner notes, and explicit acceptance controls"><img src="docs/images/task-review.png#gh-light-mode-only" alt="A task in Review with its goal, acceptance criteria, owner notes, and explicit acceptance controls"></td>
+    <td width="50%" valign="top"><strong>Projects and boards</strong><br><br><img src="docs/images/overview-dark.png#gh-dark-mode-only" alt="Boards grouped by Codex project"><img src="docs/images/overview.png#gh-light-mode-only" alt="Boards grouped by Codex project"></td>
+    <td width="50%" valign="top"><strong>Task review</strong><br><br><img src="docs/images/task-review-dark.png#gh-dark-mode-only" alt="A task's goal, checks, activity, and review controls"><img src="docs/images/task-review.png#gh-light-mode-only" alt="A task's goal, checks, activity, and review controls"></td>
   </tr>
 </table>
 
-*Product captures use isolated demonstration data. [More screenshots and editable graphics](docs/graphics.md).*
+Screenshots use example projects. [More captures and editable artwork](docs/graphics.md).
 
 ## Install the current preview
 
-You need a Codex desktop version with plugin/MCP App entrypoints, the Codex CLI, and **Node.js 22.13 or newer**.
+Requires **Codex desktop with plugin/MCP App support**, the **Codex CLI**, and **Node.js 22.13 or newer**.
 
 ```sh
 codex plugin marketplace add vrnrn/Threadboard --ref main
 codex plugin add threadboard@threadboard-plugins
 ```
 
-Fully quit and reopen Codex, then open **Threadboard** from the sidebar. Your existing projects and boards appear in **Your boards**. Repository installation uses `node` from Codex's PATH; the source includes compiled assets, so consumers do not need npm or a build step.
+Fully quit and reopen Codex, then open **Threadboard** from the sidebar. The repository includes compiled assets; no npm install or build step is needed. Node must be available on Codex's PATH.
+
+You can also [download the website preview](https://threadboard.vrnrn.com/#install), extract the ZIP, and run `node install.mjs` from that folder. The installer checks the package, finds Node, and preserves existing task data during updates.
 
 ### Install a release
 
-The latest downloadable package is still [the `0.1.1` preview](https://github.com/vrnrn/Threadboard/releases/tag/v0.1.1). It uses manual workspace association and manual refresh; it predates the native project discovery, named boards, and live updates shown above.
+The older [GitHub release, 0.1.1](https://github.com/vrnrn/Threadboard/releases/tag/v0.1.1), uses manual workspace association and refresh. Use the website or repository preview for the native projects, named boards, and live updates shown here.
 
-Download its ZIP, extract it, and run `node install.mjs`. The installer discovers Node, verifies checksums, and keeps plugin files separate from task storage. Reopen Codex and follow that release's included README. Installing a newer package preserves task data.
+## Using the board
 
-## A few useful details
+Open a card and choose **Start in new chat**, then **send the prepared prompt** in Codex to begin. A named board can also have a companion chat. [The user guide](docs/usage.md) covers ownership, review, exports, backups, and recovery.
 
-A new card chat opens with a prefilled prompt: **send it to begin**. Creating a named board can also request a companion chat named `<board name> Threadboard` through Codex's native project-aware tools. Threadboard stores the chat reference and deliberate task state, without reading conversation history.
+**N** creates a task, **⌘/Ctrl K** focuses search, and **Escape** closes a dialog. Search covers loaded cards; boards with more than 200 tasks offer **Load more tasks**.
 
-If Codex leaves the board in a split pane after Back, **Open full view** beside Refresh requests the sidebar app and carries the selected project, board, and archive view. Codex owns its navigation and pane layout; this new recovery control still needs native-host verification.
+This is preview software. Native board opening has been tested locally. Card-launch project placement, sidebar icons after a host restart, and **Open full view** recovery still need native-host verification. Browser tests cannot confirm Codex's window layout. Threadboard is independently distributed and is not listed in OpenAI's universal directory.
 
-Shortcuts: **N** creates a task, **⌘/Ctrl K** focuses search, and **Escape** closes a dialog. [The user guide](docs/usage.md) covers board navigation, claims, companion chats, exports, backups, and removal.
+## Development
 
-## Build and contribute
+See [development and verification](docs/development.md) for builds, tests, benchmarks, and packaging. The website lives in [`site/`](site/README.md). Run `npm run graphics` to update product screenshots and repository artwork.
 
-See [the development guide](docs/development.md) for local setup, tests, performance checks, packaging, and installation verification. Regenerate the current product captures and social artwork with `npm run graphics`.
-
-Native board opening has been confirmed locally. The preview's browser workflows, packaged MCP execution, and clean installation are tested; card-launch project placement and the full-view recovery control have separate native-host checks remaining. Threadboard is independently distributed through its repository marketplace; it has not been submitted to OpenAI's universal directory.
-
-The design was inspired by [Cline Kanban](https://github.com/cline/kanban); this implementation is original. [Release notes](RELEASE_NOTES.md) track shipped and source previews. [The vision](https://github.com/vrnrn/Threadboard/blob/main/VISION.md) and [architecture](https://github.com/vrnrn/Threadboard/blob/main/ARCHITECTURE.md) describe the longer-term product.
-
-MIT licensed. Bundled dependencies retain their own licenses in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). [Report a bug](https://github.com/vrnrn/Threadboard/issues).
+Inspired by [Cline Kanban](https://github.com/cline/kanban). MIT licensed; bundled dependency licenses are in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). [Report a bug](https://github.com/vrnrn/Threadboard/issues).

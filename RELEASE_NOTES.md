@@ -1,5 +1,15 @@
 # Release notes
 
+## Unreleased — 0.1.4-dev.8
+
+- Delayed task reads no longer replace a newer card or reopen a closed dialog. Manual refresh preserves loaded pages, and pagination retries when the board changes between reads.
+- Moving or reordering a task within its current column preserves its prepared chat. Launch binding rechecks blockers and prerequisites. Review cards consistently show their most recent submission.
+- Dialogs make background controls inactive. Task shortcuts respect modifier keys, and cancelling a drag resumes live updates.
+- Website and repository copy is shorter, installation links point to the current preview, and artwork uses a consistent neutral palette. Small-screen explanatory text is larger; obsolete screenshot styles are removed.
+- The website demo matches task ownership and activity ordering in the app, and its transport is included in TypeScript checks.
+- Project metadata refresh skips unchanged database rows. Installer failures clean up their staging directory. CI checks compiled assets and all website package inputs.
+
+
 ## Current source and website preview — 0.1.4-dev.7
 
 The three-line Threadboard icon now appears in the package's light and dark assets and in MCP server/tool discovery for the sidebar app. The icon is embedded locally and needs no remote asset. Close Threadboard and fully quit and reopen Codex after updating so the host reloads discovery metadata.

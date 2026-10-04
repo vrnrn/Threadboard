@@ -108,8 +108,8 @@
       "projectId": "23979a33-688a-4616-a53e-e7d756eba742",
       "boardId": "b38a5ef6-2857-42f6-b6ef-8b0f8c8edadd",
       "number": 1,
-      "title": "Make onboarding feel effortless",
-      "description": "Help a new user get from installation to their first useful task. Keep the flow short and make each next step clear.",
+      "title": "Guide users through their first task",
+      "description": "Show new users how to open a board, add a task, and start a chat.",
       "criteria": "Keep keyboard navigation working.\nVerify the changed behavior in the board.",
       "status": "backlog",
       "priority": "high",
@@ -474,7 +474,7 @@
         "taskId": "2c33d5ff-6b8c-4b1c-8994-b66f6813b274",
         "kind": "submitted",
         "actor": "Release chat",
-        "note": "Clean installation passed. Upgrade from dev.5 to dev.6 retained the saved task. All 36 packaged files verified.",
+        "note": "Clean installation passed. Upgrading retained the saved task. All 36 packaged files verified.",
         "createdAt": "2026-10-04T22:52:37.078Z"
       },
       {

@@ -209,7 +209,7 @@ export class Store {
       createdAt: raw.created_at, expiresAt: raw.expires_at };
   }
   private task(raw: Row, full = true, summary?: { run?: Row; dependencies: Task['dependencies'] }): Task {
-    const run = summary ? summary.run : this.prepare("SELECT * FROM runs WHERE task_id=? AND (state IN ('launching','running') OR (state='submitted' AND ? IN ('review','done'))) ORDER BY created_at DESC LIMIT 1").get(raw.id, raw.status) as Row | undefined;
+    const run = summary ? summary.run : this.prepare("SELECT * FROM runs WHERE task_id=? AND (state IN ('launching','running') OR (state='submitted' AND ? IN ('review','done'))) ORDER BY rowid DESC LIMIT 1").get(raw.id, raw.status) as Row | undefined;
     const dependencies = summary ? summary.dependencies : this.prepare('SELECT t.id,t.number,t.title,t.status FROM dependencies d JOIN tasks t ON t.id=d.prerequisite_id WHERE d.task_id=? ORDER BY t.number').all(raw.id) as Row[];
     return { id: raw.id, projectId: raw.project_id, boardId: raw.board_id, number: raw.number, title: raw.title,
       description: full ? raw.description : raw.description.slice(0, 140), criteria: full ? raw.criteria : '',
@@ -220,7 +220,7 @@ export class Store {
   private summaries(rows: Row[]): Task[] {
     if (!rows.length) return [];
     const placeholders = rows.map(() => '?').join(','), ids = rows.map(row => row.id);
-    const runs = this.prepare(`SELECT r.* FROM runs r JOIN tasks t ON t.id=r.task_id WHERE r.task_id IN (${placeholders}) AND (r.state IN ('launching','running') OR (r.state='submitted' AND t.status IN ('review','done'))) ORDER BY r.created_at DESC,r.id`).all(...ids) as Row[];
+    const runs = this.prepare(`SELECT r.* FROM runs r JOIN tasks t ON t.id=r.task_id WHERE r.task_id IN (${placeholders}) AND (r.state IN ('launching','running') OR (r.state='submitted' AND t.status IN ('review','done'))) ORDER BY r.rowid DESC`).all(...ids) as Row[];
     const runByTask = new Map<string, Row>();
     for (const run of runs) if (!runByTask.has(run.task_id)) runByTask.set(run.task_id, run);
     const dependencies = this.prepare(`SELECT d.task_id,t.id,t.number,t.title,t.status FROM dependencies d JOIN tasks t ON t.id=d.prerequisite_id WHERE d.task_id IN (${placeholders}) ORDER BY t.number`).all(...ids) as Row[];
@@ -272,7 +272,10 @@ export class Store {
           }
         } else {
           const root = project.rootPaths.includes(existing.root) ? existing.root : project.rootPaths[0];
-          this.prepare('UPDATE projects SET name=?,root=?,roots=?,codex_bound=1 WHERE id=?').run(project.name, root, JSON.stringify(project.rootPaths), project.id);
+          const rootPaths = JSON.stringify(project.rootPaths);
+          if (existing.name !== project.name || existing.root !== root || existing.roots !== rootPaths || !existing.codex_bound) {
+            this.prepare('UPDATE projects SET name=?,root=?,roots=?,codex_bound=1 WHERE id=?').run(project.name, root, rootPaths, project.id);
+          }
         }
         this.ensureDefaultBoard(project.id);
       }
@@ -345,6 +348,12 @@ export class Store {
     return this.transaction(() => {
       const row = this.row(input.taskId, input.projectId); this.checkVersion(row, input.version);
       if (row.archived) fail('ARCHIVED', 'Restore this task before moving it.');
+      if (input.status === row.status) {
+        if (input.rank === undefined || input.rank === row.rank) return this.task(row);
+        this.prepare('UPDATE tasks SET rank=?,version=version+1,updated_at=? WHERE id=?').run(input.rank, now(), row.id);
+        this.event(row, 'reordered', 'You');
+        return this.task(this.row(row.id));
+      }
       const active = this.activeRun(row.id);
       if (input.status === 'in_progress' && active?.state !== 'running') fail('CLAIM_REQUIRED', 'Start this task in Codex or claim it from an existing chat.');
       if (input.status === 'review' && active?.state === 'launching') fail('NOT_RUNNING', 'The new chat must bind to its task before submitting work.');
@@ -377,12 +386,11 @@ export class Store {
       this.event(row, 'dependency', 'You', input.remove ? 'Removed prerequisite' : 'Added prerequisite'); return this.task(this.row(row.id));
     });
   }
-  private eligible(row: Row) {
+  private readyToStart(row: Row) {
     if (row.archived || row.status === 'done' || row.status === 'review') fail('NOT_READY', 'Restore this task or move it to Ready before starting work.');
     if (row.blocked_reason) fail('BLOCKED', 'This task is blocked. Resolve its blocked reason first.');
     const dependency = this.prepare("SELECT t.number FROM dependencies d JOIN tasks t ON t.id=d.prerequisite_id WHERE d.task_id=? AND t.status <> 'done' LIMIT 1").get(row.id) as Row | undefined;
     if (dependency) fail('PREREQUISITE', `Finish TB-${dependency.number} before starting this task.`);
-    if (this.activeRun(row.id)) fail('ALREADY_CLAIMED', 'Another chat already owns this task. Open its chat or explicitly release it.');
   }
   claim(input: { projectId: string; taskId: string; version: number; attemptId: string; token: string; owner: string; threadId?: string; launching?: boolean }): { task: Task; run: Run; token: string } {
     return this.transaction(() => {
@@ -392,7 +400,9 @@ export class Store {
         if (prior.task_id !== input.taskId || prior.token_hash !== hash(input.token)) fail('OPERATION_CONFLICT', 'That attempt ID belongs to another claim.');
         return { task: this.task(this.row(prior.task_id)), run: this.run(prior), token: input.token };
       }
-      const row = this.row(input.taskId, input.projectId); this.eligible(row); this.checkVersion(row, input.version);
+      const row = this.row(input.taskId, input.projectId); this.readyToStart(row);
+      if (this.activeRun(row.id)) fail('ALREADY_CLAIMED', 'Another chat already owns this task. Open its chat or explicitly release it.');
+      this.checkVersion(row, input.version);
       const id = randomUUID(), created = now();
       const expiry = input.launching ? new Date(Date.now() + 15 * 60_000).toISOString() : null;
       this.prepare('INSERT INTO runs(id,task_id,state,owner,thread_id,token_hash,attempt_id,created_at,expires_at) VALUES(?,?,?,?,?,?,?,?,?)')
@@ -419,6 +429,7 @@ export class Store {
       }
       if (run.state !== 'launching') fail('INVALID_RUN', 'This reservation is no longer active. Start a new run explicitly.');
       if (run.expires_at < now()) fail('EXPIRED_LAUNCH', 'This launch reservation expired. Release it and start again.');
+      this.readyToStart(this.row(run.task_id));
       this.prepare("UPDATE runs SET state='running',owner=?,thread_id=?,expires_at=NULL WHERE id=?").run(input.owner, input.threadId || null, run.id);
       this.prepare("UPDATE tasks SET status='in_progress',version=version+1,updated_at=? WHERE id=?").run(now(), run.task_id);
       this.event(this.row(run.task_id), 'started', input.owner);

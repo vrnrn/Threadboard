@@ -1,15 +1,16 @@
 # Using Threadboard
 
-This guide describes the current `0.1.4-dev.6` preview. The downloadable `0.1.1` release uses manually associated workspace boards and manual refresh.
+This guide covers the current repository and [website preview](https://threadboard.vrnrn.com/). The older GitHub release, `0.1.1`, uses manually associated workspace boards and manual refresh.
 
 ## Open your projects
-
 
 In the current preview, the **Your boards** overview lists boards grouped by existing Codex projects. Select a project in the sidebar to see its boards, then choose a board. The sidebar and breadcrumb provide a path back to the overview. Threadboard uses Codex's project IDs, names, and workspace roots. Renames update on refresh. Removing a project hides its board and retains its saved tasks; a different native project gets a separate board even if it uses the same directory. Older workspace boards migrate automatically when exactly one native project matches their directory. Unmatched or ambiguous older boards remain saved instead of being merged.
 
 Each project can have multiple named boards. Use the **Board** picker to switch. Existing cards stay on **General**; task numbers remain unique across the project. Cards, archives, dependencies, and exports belong to their selected board.
 
-If Codex leaves Threadboard beside a blank chat after navigating Back, use **Open full view** (the expand icon beside Refresh). It opens Threadboard’s sidebar app through the [documented app deep link](https://github.com/openai/mcp-extensions/blob/main/docs/spec.md#deep-links), restoring the current project, named board, and archive view. Links contain only IDs and the archive flag. Codex controls its native Back history and pane arrangement; both a side panel and a sidebar app can report the `fullscreen` display mode. This control requests navigation to the sidebar app; its native layout still needs host verification. Incoming links wait for an open dialog to close, preserving unfinished drafts in that instance.
+If Codex leaves Threadboard beside a blank chat after navigating Back, use **Open full view** (the expand icon beside Refresh). It requests the sidebar app with the selected project, board, and archive view. Codex controls the resulting pane layout; this recovery control still needs native-host verification. Incoming links wait for an open dialog to close, preserving unfinished drafts in that instance.
+
+## Work on a task
 
 The workflow is **Backlog → Ready → In progress → Review → Done**. Cards support descriptions, acceptance criteria, priorities, blocked reasons, prerequisites, activity notes, archiving and local JSON export. Use the card's move menu or the detail panel for keyboard-accessible moves; drag between columns with a pointer.
 
@@ -18,9 +19,11 @@ The workflow is **Backlog → Ready → In progress → Review → Done**. Cards
 - **Review:** Read the owner's result and validation. Choose **Accept into Done** or **Request changes**.
 - **Board companion chat:** Creating a board asks Codex to create `<board name> Threadboard` inside its native project through Codex’s own project-aware chat tool. The board saves only its chat ID. **Open board chat** becomes available when linked and navigates to it. Existing General boards have **Create board chat**. Interrupted setup offers **Finish chat setup**, which checks for an existing chat before recovery. This experiment requires the native host chat tools; unsupported hosts copy a setup prompt for you to send in Codex. It uses a normal Codex model turn, with no separate API integration.
 - **Floating chat context:** The native chat bubble receives the selected board and project IDs, names, and workspace as context. Switching boards replaces that context and clears a previously shared card. Automatic task contents are not attached. This context does not assign the host-created chat to the native project or change its working directory; use the chat's **Project** menu for membership. The current extension API has no native project destination parameter.
-- **Other chats' changes:** Visible boards check a small local revision token once per second and reload cards only after local storage or project metadata changes. Checks pause when the document or panel is hidden and resume immediately on returning. Open drafts, unsent notes, and loaded pages are preserved. Temporary failures back off to 30 seconds; **Refresh board** remains available. This updates states reported through Threadboard tools; it does not infer progress from chat content or generate model turns.
+- **Other chats' changes:** Visible boards check a small local revision token once per second and reload cards only after local storage or project metadata changes. Checks pause when the document or panel is hidden and resume immediately on returning. Open drafts, unsent notes, and loaded pages are preserved, including during manual refresh. If the board changes between page reads, Threadboard reloads the pages together. Temporary failures back off to 30 seconds; **Refresh board** remains available. This updates states reported through Threadboard tools; it does not infer progress from chat content or generate model turns.
 
 Chat links use explicitly supplied native chat IDs. The plugin does not inspect transcripts. If a launch is interrupted, reopen its prepared link while the board remains open or copy its prompt. After reopening the board, release the old reservation and start again if its prompt is unavailable. Reservations expire for binding after 15 minutes and require explicit release to reuse the task. Quiet running chats keep ownership until submission or explicit release.
+
+## Keyboard and search
 
 Shortcuts: **N** creates a task, **⌘/Ctrl K** focuses search, **Escape** closes a dialog. Search and filters apply to loaded cards; use **Load more tasks** for boards above 200 cards. Task detail displays the latest 50 activity events; export includes all events.
 

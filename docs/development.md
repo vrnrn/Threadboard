@@ -11,7 +11,6 @@ npm run build
 npm test
 npx playwright install chromium
 npm run test:ui
-npm run screenshots
 npm run graphics
 npm run benchmark
 npm run benchmark:startup
@@ -32,6 +31,8 @@ The UI and stdio server are bundled, including licenses. The board loads no remo
 
 `npm run screenshots` seeds temporary projects and tasks, captures the current UI, and checks control layouts at desktop, tablet, and phone widths. It never uses your saved boards. `npm run graphics` runs those captures and renders the repository social image from `docs/graphics.html`. See [the graphics guide](graphics.md) for the asset map.
 
+Run `npm ci --prefix site` and `npm test --prefix site` to verify the website, demo, download checksum, responsive layouts, and accessibility. The root typecheck also checks the demo transport.
+
 Run Playwright suites sequentially: each suite owns `test-results/`. Screenshots show the actual browser-rendered interface with demonstration data, without simulated Codex window chrome.
 
 ## Release checks
@@ -40,7 +41,7 @@ Build before testing the packaged protocol. Then run the release audit, packagin
 
 The installer keeps plugin files and task storage separate. Installer tests run with an isolated Codex home and verify cached MCP execution, cached resource URLs, and task persistence. `THREADBOARD_PREVIOUS_RELEASE` can point to an older extracted package to verify an upgrade.
 
-The preview has 26 backend tests and 22 UI tests. Native board opening has been confirmed locally; the new full-view recovery control and card-launch project placement still need native-host verification. Browser and protocol checks cannot establish those behaviors.
+The test suites cover storage, protocol, UI workflows, and the website demo. Native board opening has been confirmed locally; the new full-view recovery control and card-launch project placement still need native-host verification. Browser and protocol checks cannot establish those behaviors.
 
 ## Planning and history
 

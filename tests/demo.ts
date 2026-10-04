@@ -7,7 +7,7 @@ export function seedDemo(store: Store, root: string) {
   const product = store.createBoard({ projectId: project.id, name: 'Product', operationId: randomUUID() });
   const release = store.createBoard({ projectId: project.id, name: 'Release', operationId: randomUUID() });
   const cards = [
-    ['Make onboarding feel effortless', 'Help a new user get from installation to their first useful task. Keep the flow short and make each next step clear.', 'backlog', 'high', ''],
+    ['Guide users through their first task', 'Show new users how to open a board, add a task, and start a chat.', 'backlog', 'high', ''],
     ['Add quick filters to the board', 'Find high-priority work and unassigned tasks without leaving the board.', 'backlog', 'low', ''],
     ['Make every action work with a keyboard', 'Keep focus visible and provide a clear path through each dialog.', 'ready', 'normal', ''],
     ['Polish the empty and error states', 'Give every screen a useful next step, including interrupted launches.', 'ready', 'low', ''],
@@ -22,7 +22,7 @@ export function seedDemo(store: Store, root: string) {
     if (['in_progress','review','done'].includes(status)) {
       const claim = store.claim({ projectId: project.id, taskId: task.id, version: task.version, owner, attemptId: randomUUID(), token: randomUUID() + randomUUID() });
       task = claim.task;
-      if (status !== 'in_progress') task = store.note({ projectId: project.id, taskId: task.id, runId: claim.run.id, token: claim.token, note: title === 'Package a one-command installation' ? 'Clean installation passed. Upgrade from dev.5 to dev.6 retained the saved task. All 36 packaged files verified.' : title === 'Verify atomic task ownership' ? '100 requests across independent processes produced one owner and 99 conflicts.' : 'Visible boards use a small revision check. Hidden panels pause; unchanged boards do not reload cards.', submit: true }).task;
+      if (status !== 'in_progress') task = store.note({ projectId: project.id, taskId: task.id, runId: claim.run.id, token: claim.token, note: title === 'Package a one-command installation' ? 'Clean installation passed. Upgrading retained the saved task. All 36 packaged files verified.' : title === 'Verify atomic task ownership' ? '100 requests across independent processes produced one owner and 99 conflicts.' : 'Visible boards use a small revision check. Hidden panels pause; unchanged boards do not reload cards.', submit: true }).task;
       if (status === 'done') store.move({ projectId: project.id, taskId: task.id, version: task.version, status: 'done' });
     }
   }

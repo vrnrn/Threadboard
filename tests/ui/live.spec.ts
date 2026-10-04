@@ -143,3 +143,27 @@ test('slow revision checks never overlap and failures back off until the panel i
   await page.evaluate(() => window.dispatchEvent(new Event('focus')));
   await expect(page.locator('.board-footer').getByText('Live', { exact: true })).toBeVisible({ timeout: 900 });
 });
+
+test('pagination recovers from changes between pages and manual refresh keeps loaded cards', async ({ page }) => {
+  const f = await fixture(page, 'Changing pagination');
+  const tasks: import('../../src/types.js').Task[] = [];
+  for (let index = 0; index < 205; index++) tasks.push((await f.call('create_task', { ...f.args, title: `Changing page ${index}`, operationId: randomUUID() })).task);
+  await f.open();
+  let changed = false;
+  await page.route('**/api', async route => {
+    const body = route.request().postDataJSON();
+    if (!changed && body.name === 'get_board' && body.args.offset === 200) {
+      changed = true;
+      await f.call('archive_task', { projectId: f.project.id, taskId: tasks[0].id, version: tasks[0].version, archived: true });
+    }
+    await route.continue();
+  });
+  await page.getByRole('button', { name: 'Load more tasks (200 of 205)', exact: true }).click();
+  await expect(page.locator('.task-card')).toHaveCount(204);
+  await expect(page.getByTestId(`task-${tasks[0].number}`)).toHaveCount(0);
+  await expect(page.getByTestId(`task-${tasks[200].number}`)).toHaveCount(1);
+  await expect(page.getByTestId(`task-${tasks[204].number}`)).toHaveCount(1);
+  await page.getByRole('button', { name: 'Refresh board', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Refresh board', exact: true })).toBeEnabled();
+  await expect(page.locator('.task-card')).toHaveCount(204);
+});
