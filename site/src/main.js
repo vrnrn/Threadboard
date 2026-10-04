@@ -14,7 +14,7 @@ function applyTheme(theme) {
   );
   themeToggle.title = themeToggle.getAttribute("aria-label");
   document.querySelector('meta[name="theme-color"]').content =
-    theme === "dark" ? "#19171b" : "#f7f4f0";
+    theme === "dark" ? "#181818" : "#f7f5f0";
   for (const image of document.querySelectorAll("[data-theme-image]"))
     image.src = imageSource(image.dataset.themeImage);
   document.querySelector("[data-open-demo]").href = `/demo/?theme=${theme}`;
@@ -42,7 +42,7 @@ const steps = [
     state: "In progress",
     owner: "Release chat owns this task",
     note: "Checking the ZIP against its manifest. Next: upgrade an existing installation.",
-    copy: "A claim gives one chat the task. Its deliberate updates stay with the card, where another chat can find them.",
+    copy: "One chat owns the task. Progress notes stay on the card for you and other chats to read.",
   },
   {
     state: "Review",
@@ -54,7 +54,7 @@ const steps = [
     state: "Done",
     owner: "Accepted into Done",
     note: "Installation verified. Task data preserved. The result stays on the card.",
-    copy: "Acceptance is explicit. The completed card keeps the brief, the owner, and the result for the next time you need them.",
+    copy: "You mark the work Done. The card keeps its description, notes, and result.",
   },
 ];
 const stepTabs = [...document.querySelectorAll("[data-step]")];

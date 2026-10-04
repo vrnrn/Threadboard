@@ -24,6 +24,97 @@ async function workspace(page: Page, number: number) {
   return { project, cleanup: () => {} }; // The preview process owns and removes fixture directories.
 }
 
+test('a delayed task read cannot replace a newer card or reopen a closed dialog', async ({ page }) => {
+  const w = await workspace(page, 10);
+  const tasks: import('../../src/types.js').Task[] = [];
+  for (const title of ['Slow card', 'Newer card']) tasks.push((await api(page, 'create_task', { projectId: w.project.id, title, operationId: randomUUID() })).task);
+  await page.getByRole('button', { name: 'Refresh board', exact: true }).click();
+  let release!: () => void, captured!: () => void, finished!: () => void;
+  let blocked = new Promise<void>(resolve => { release = resolve; });
+  const waiting = new Promise<void>(resolve => { captured = resolve; });
+  const delivered = new Promise<void>(resolve => { finished = resolve; });
+  await page.route('**/api', async route => {
+    const body = route.request().postDataJSON();
+    if (body.name === 'get_task' && body.args.taskId === tasks[0].id) {
+      const response = await route.fetch(); captured(); await blocked;
+      await route.fulfill({ response }); finished();
+    } else await route.continue();
+  });
+  try {
+    await page.getByRole('button', { name: 'Slow card', exact: true }).click();
+    await waiting;
+    await page.getByRole('button', { name: 'Newer card', exact: true }).click();
+    await expect(page.getByRole('textbox', { name: 'Task title', exact: true })).toHaveValue('Newer card');
+  } finally { release(); }
+  await delivered;
+  await expect(page.getByRole('textbox', { name: 'Task title', exact: true })).toHaveValue('Newer card');
+  await page.getByRole('button', { name: 'Close dialog', exact: true }).click();
+  await page.unroute('**/api');
+
+  await page.getByRole('button', { name: 'Newer card', exact: true }).click();
+  let reloading!: () => void, reloaded!: () => void;
+  blocked = new Promise<void>(resolve => { release = resolve; });
+  const reloadWaiting = new Promise<void>(resolve => { reloading = resolve; });
+  const reloadDone = new Promise<void>(resolve => { reloaded = resolve; });
+  await page.route('**/api', async route => {
+    if (route.request().postDataJSON().name !== 'get_task') { await route.continue(); return; }
+    const response = await route.fetch(); reloading(); await blocked;
+    await route.fulfill({ response }); reloaded();
+  });
+  try {
+    await page.getByRole('button', { name: 'Reload task', exact: true }).click();
+    await reloadWaiting;
+    await page.getByRole('button', { name: 'Close dialog', exact: true }).click();
+  } finally { release(); }
+  await reloadDone;
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+});
+
+test('a task read from a previous board is discarded after navigation', async ({ page }) => {
+  const w = await workspace(page, 10);
+  const { task } = await api(page, 'create_task', { projectId: w.project.id, title: 'Previous-board task', operationId: randomUUID() });
+  await page.getByRole('button', { name: 'Refresh board', exact: true }).click();
+  let release!: () => void, captured!: () => void, finished!: () => void;
+  const blocked = new Promise<void>(resolve => { release = resolve; });
+  const waiting = new Promise<void>(resolve => { captured = resolve; });
+  const delivered = new Promise<void>(resolve => { finished = resolve; });
+  await page.route('**/api', async route => {
+    const body = route.request().postDataJSON();
+    if (body.name !== 'get_task' || body.args.taskId !== task.id) { await route.continue(); return; }
+    const response = await route.fetch(); captured(); await blocked;
+    await route.fulfill({ response }); finished();
+  });
+  try {
+    await page.getByRole('button', { name: 'Previous-board task', exact: true }).click();
+    await waiting;
+    await page.getByRole('button', { name: 'Your boards', exact: true }).first().click();
+  } finally { release(); }
+  await delivered;
+  await expect(page.getByRole('heading', { name: 'Your boards', exact: true })).toBeVisible();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+});
+
+test('archive navigation preserves filters and recovers when the read fails', async ({ page }) => {
+  await workspace(page, 10);
+  await page.getByRole('textbox', { name: 'Search tasks' }).fill('Retain this search');
+  await page.getByRole('combobox', { name: 'Filter tasks' }).selectOption('priority');
+  await page.route('**/api', async route => {
+    const body = route.request().postDataJSON();
+    if (body.name === 'get_board' && body.args.archived) {
+      await route.fulfill({ status: 503, json: { error: { message: 'Archive temporarily unavailable' } } });
+    } else await route.continue();
+  });
+  await page.getByRole('button', { name: 'Archive', exact: true }).click();
+  await expect(page.getByRole('alert')).toContainText('Archive temporarily unavailable');
+  await expect(page.getByRole('button', { name: 'Board', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('textbox', { name: 'Search tasks' })).toHaveValue('Retain this search');
+  await page.unroute('**/api');
+  await page.getByRole('button', { name: 'Archive', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Archive', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('textbox', { name: 'Search tasks' })).toHaveValue('Retain this search');
+  await expect(page.getByRole('combobox', { name: 'Filter tasks' })).toHaveValue('priority');
+});
+
 test('create, edit, note, move, archive and restore survive a reload', async ({ page }) => {
   const w = await workspace(page, 1);
   try {

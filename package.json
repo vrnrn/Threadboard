@@ -1,6 +1,6 @@
 {
   "name": "threadboard",
-  "version": "0.1.4-dev.7",
+  "version": "0.1.4-dev.8",
   "private": true,
   "type": "module",
   "description": "A fully local Kanban board inside Codex.",

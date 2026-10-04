@@ -1,6 +1,6 @@
 {
   "name": "threadboard",
-  "version": "0.1.4-dev.7",
+  "version": "0.1.4-dev.8",
   "description": "A fully local Kanban board inside Codex. Create tasks, coordinate chats, and review completed work without a hosted service.",
   "author": {
     "name": "Threadboard contributors"

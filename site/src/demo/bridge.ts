@@ -7,16 +7,26 @@ import type {
   Project,
   ProjectBoard,
   Task,
+  TaskEvent,
 } from "../../../src/types.js";
-const state = structuredClone(seed) as any;
+interface DemoState {
+  projects: Project[];
+  boards: ProjectBoard[];
+  tasks: Task[];
+  events: Record<string, TaskEvent[]>;
+  projectId: string;
+  boardId: string;
+}
+const state = structuredClone(seed) as DemoState;
 const now = () => new Date().toISOString();
 for (const task of state.tasks) {
   task.createdAt = now();
   task.updatedAt = now();
 }
-for (const entries of Object.values(state.events) as any[])
+for (const entries of Object.values(state.events))
   for (const event of entries) event.createdAt = now();
 let revision = 1;
+let eventId = Math.max(0, ...Object.values(state.events).flat().map(event => event.id));
 const copy = <T>(value: T): T => structuredClone(value);
 const token = () => `website-demo-${revision}`;
 function catalogue() {
@@ -82,7 +92,7 @@ function taskFor(args: any): Task {
 }
 function note(task: Task, text: string, kind = "comment", actor = "You") {
   (state.events[task.id] ||= []).push({
-    id: revision,
+    id: ++eventId,
     taskId: task.id,
     kind,
     actor,
@@ -132,7 +142,7 @@ export async function call<T = any>(name: string, args: any = {}): Promise<T> {
       break;
     case "get_task": {
       const task = taskFor(args);
-      result = { task, events: state.events[task.id] || [] };
+      result = { task, events: [...(state.events[task.id] || [])].sort((a, b) => b.id - a.id).slice(0, 50) };
       break;
     }
     case "create_task": {
@@ -184,13 +194,21 @@ export async function call<T = any>(name: string, args: any = {}): Promise<T> {
     }
     case "move_task": {
       const task = taskFor(args);
+      if (task.archived) throw new Error("Restore this task before moving it.");
+      if (task.status === args.status && (args.rank === undefined || args.rank === task.rank)) {
+        result = { task };
+        break;
+      }
       if (args.status === "in_progress" && task.run?.state !== "running")
         throw new Error(
           "Use Start in new chat to give a chat this task first.",
         );
-      if (args.status !== "in_progress" && task.run?.state === "running")
-        task.run.state = "released";
-      if (args.status === "done" && task.run) task.run.state = "submitted";
+      if (args.status === "review" && task.run?.state === "launching")
+        throw new Error("Send the prepared prompt before submitting work.");
+      if (args.status !== task.status && args.status !== "in_progress" && task.run) {
+        if (args.status === "review" && task.run.state === "running") task.run.state = "submitted";
+        else if (!(args.status === "done" && task.run.state === "submitted")) task.run = null;
+      }
       task.status = args.status;
       if (args.rank !== undefined) task.rank = args.rank;
       note(task, `Moved to ${args.status.replace("_", " ")}.`, "moved");
@@ -251,8 +269,10 @@ export async function call<T = any>(name: string, args: any = {}): Promise<T> {
     }
     case "prepare_task_launch": {
       const task = taskFor(args);
-      if (task.status === "backlog")
-        throw new Error("Move this task to Ready before starting it.");
+      if (task.archived || task.status === "review" || task.status === "done")
+        throw new Error("Restore this task or move it to Ready before starting work.");
+      if (task.blockedReason || task.dependencies.some(item => item.status !== "done"))
+        throw new Error("Resolve this task’s blockers and prerequisites first.");
       if (task.run && ["running", "launching"].includes(task.run.state))
         throw new Error("This card already has a chat owner.");
       task.run = {
@@ -276,13 +296,17 @@ export async function call<T = any>(name: string, args: any = {}): Promise<T> {
     }
     case "release_task": {
       const task = taskFor(args);
-      if (task.run) task.run.state = "released";
+      if (!task.run || !["running", "launching"].includes(task.run.state))
+        throw new Error("There is no active claim to release.");
+      task.run = null;
       task.status = "ready";
       changed(task);
       result = { task };
       break;
     }
     case "create_board": {
+      if (state.boards.some(item => item.projectId === args.projectId && item.name.toLowerCase() === args.name.trim().toLowerCase()))
+        throw new Error("This project already has a board with that name.");
       const item = {
         id: crypto.randomUUID(),
         projectId: args.projectId,
@@ -418,7 +442,8 @@ export async function openLink(url: string) {
       url === `demo:task:${item.id}` ||
       (item.run?.threadId && url === `codex://threads/${item.run.threadId}`),
   );
-  if (!task) throw new Error("This demo card no longer exists.");
+  if (!task?.run) throw new Error("This demo card no longer has a chat.");
+  const run = task.run;
   const dialog = document.createElement("dialog");
   dialog.className = "demo-chat";
   dialog.setAttribute("aria-label", "Demo chat handoff");
@@ -437,8 +462,8 @@ export async function openLink(url: string) {
   const status = document.createElement("p");
   status.className = "demo-chat-status";
   status.setAttribute("role", "status");
-  let submitted = !["launching", "running"].includes(task.run.state);
-  const pending = task.run.state === "launching";
+  let submitted = !["launching", "running"].includes(run.state);
+  const pending = run.state === "launching";
   status.textContent = pending
     ? "The prompt is ready. Send it to give this demo chat ownership."
     : submitted
@@ -453,14 +478,15 @@ export async function openLink(url: string) {
       ? "Back to the board"
       : "Submit demo result";
   action.addEventListener("click", () => {
+    if (task.run !== run) { dialog.close(); return; }
     if (submitted) {
       dialog.close();
       return;
     }
-    if (task.run.state === "launching") {
-      task.run.state = "running";
-      task.run.owner = "Demo chat";
-      task.run.threadId = crypto.randomUUID();
+    if (run.state === "launching") {
+      run.state = "running";
+      run.owner = "Demo chat";
+      run.threadId = crypto.randomUUID();
       task.status = "in_progress";
       note(
         task,
@@ -473,7 +499,7 @@ export async function openLink(url: string) {
         "The card is now In progress, with one owner. Simulate a result to send it to Review.";
       action.textContent = "Submit demo result";
     } else {
-      task.run.state = "submitted";
+      run.state = "submitted";
       task.status = "review";
       note(
         task,

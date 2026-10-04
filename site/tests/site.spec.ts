@@ -66,7 +66,7 @@ test("installation is actionable; the downloadable ZIP matches its checksum", as
     .first()
     .click();
   await expect(
-    page.getByRole("heading", { name: "Put a board behind the work." }),
+    page.getByRole("heading", { name: "Add Threadboard to Codex." }),
   ).toBeInViewport();
   await page.getByRole("tab", { name: "With the Codex CLI" }).click();
   await expect(page.locator("#cli-instructions")).toBeVisible();
@@ -129,6 +129,9 @@ for (const theme of ["dark", "light"])
         })),
         `Accessibility at ${width}px`,
       ).toEqual([]);
+      if (width === 1440 || width === 390) {
+        await page.screenshot({ path: `test-results/site-${theme}-${width}.png` });
+      }
     }
     await page.setViewportSize({ width: 390, height: 844 });
     await page
@@ -176,7 +179,7 @@ test("the actual app demo can edit, move, create, filter, switch boards and rese
   );
   await app.getByRole("button", { name: "Close dialog" }).click();
   await app
-    .getByRole("button", { name: /^Make onboarding feel effortless/ })
+    .getByRole("button", { name: /^Guide users through their first task/ })
     .click();
   const detail = app.getByRole("dialog", { name: "TB-1 · Orbit" });
   await detail
@@ -244,7 +247,7 @@ test("the actual app demo can edit, move, create, filter, switch boards and rese
   await expect(app.getByRole("region", { name: "Board picker" })).toBeVisible();
   await app.getByRole("button", { name: /^Open General, Atlas,/ }).click();
   await expect(
-    app.getByText("Start with one clear task.", { exact: true }),
+    app.getByText("Add your first task.", { exact: true }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Reset demo board" }).click();
   await expect(
@@ -252,7 +255,7 @@ test("the actual app demo can edit, move, create, filter, switch boards and rese
   ).toBeVisible();
   await expect(app.locator(".task-card")).toHaveCount(9);
   await expect(
-    app.getByRole("button", { name: /^Make onboarding feel effortless/ }),
+    app.getByRole("button", { name: /^Guide users through their first task/ }),
   ).toBeVisible();
   expect(calls).toEqual([]);
 });
@@ -297,4 +300,27 @@ test("the demo handoff reserves a card, starts one owner, submits to Review and 
   expect(
     requests.some((url) => /codex:|\/api(?:\?|$)|api\.openai/.test(url)),
   ).toBe(false);
+});
+
+test("released demo chats become unassigned and new activity appears first", async ({ page }) => {
+  await page.goto("/");
+  const app = page.frameLocator("#app-demo");
+  await app.getByRole("button", { name: /^Preserve tasks across plugin updates/ }).click();
+  const detail = app.getByRole("dialog", { name: "TB-5 · Orbit" });
+  await detail.getByRole("textbox", { name: "Add a note" }).fill("Latest demo update");
+  await detail.getByRole("button", { name: "Add note", exact: true }).click();
+  await expect(detail.locator(".events .event").first()).toContainText("Latest demo update");
+  await detail.getByRole("button", { name: "Release ownership" }).click();
+  await expect(detail.getByText("No chat assigned", { exact: true })).toBeVisible();
+  await detail.getByRole("button", { name: "Close dialog" }).click();
+  await app.getByRole("combobox", { name: "Filter tasks" }).selectOption("unassigned");
+  await expect(app.getByTestId("task-5")).toBeVisible();
+
+  await app.getByTestId("task-1").getByRole("button", { name: /^Guide users/ }).click();
+  await app.getByRole("button", { name: "Start in new chat" }).click();
+  const chat = app.getByRole("dialog", { name: "Demo chat handoff" });
+  await expect(chat.getByRole("button", { name: "Send demo prompt" })).toBeVisible();
+  await chat.press("Escape");
+  await expect(chat).toHaveCount(0);
+  await expect(app.getByRole("dialog", { name: "TB-1 · Orbit" })).toBeVisible();
 });

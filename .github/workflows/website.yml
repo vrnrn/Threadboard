@@ -2,9 +2,9 @@ name: Website
 on:
   push:
     branches: [main]
-    paths: ['site/**', 'src/ui/**', 'src/types.ts', 'docs/images/**', 'plugins/threadboard/**', 'scripts/release.mjs', 'package.json', '.github/workflows/website.yml']
+    paths: ['site/**', 'src/**', 'docs/**', 'plugins/threadboard/**', 'scripts/**', '*.json', '*.md', 'LICENSE', '.agents/**', '.github/workflows/website.yml']
   pull_request:
-    paths: ['site/**', 'src/ui/**', 'src/types.ts', 'docs/images/**', 'plugins/threadboard/**', 'scripts/release.mjs', 'package.json', '.github/workflows/website.yml']
+    paths: ['site/**', 'src/**', 'docs/**', 'plugins/threadboard/**', 'scripts/**', '*.json', '*.md', 'LICENSE', '.agents/**', '.github/workflows/website.yml']
 permissions:
   contents: read
 concurrency:
@@ -22,7 +22,13 @@ jobs:
         with:
           node-version-file: site/.node-version
           cache: npm
-          cache-dependency-path: site/package-lock.json
+          cache-dependency-path: |
+            package-lock.json
+            site/package-lock.json
+      - run: npm ci
+        working-directory: .
+      - run: npm run build
+        working-directory: .
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm test

@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createPortal } from 'react-dom';
-import { Archive, ArrowDown, ArrowRight, ArrowUpRight, Check, CheckCircle2, ChevronDown, ChevronRight, Circle, CircleDot, Clipboard, Download, Flag, FolderOpen, GripVertical, Kanban, Link2, LockKeyhole, Maximize2, MessageSquare, MoreHorizontal, Plus, RefreshCw, Search, Send, ShieldCheck, Sparkles, X } from 'lucide-react';
+import { Archive, ArrowDown, ArrowRight, ArrowUpRight, Check, CheckCircle2, ChevronDown, ChevronRight, Circle, CircleDot, Clipboard, Download, Flag, FolderOpen, Kanban, Link2, LockKeyhole, Maximize2, MessageSquare, MoreHorizontal, Plus, RefreshCw, Search, Send, ShieldCheck, X } from 'lucide-react';
 import { call, claimIds, openFullView, openLink, requestBoardChat, setBoardContext, share, start } from './bridge.js';
 import type { BoardLocation } from './navigation.js';
 import { watchLocalChanges } from './live.js';
+import { readBoardPages } from './board-data.js';
 import { PRIORITIES, STATUSES, STATUS_LABELS, type Board, type BoardChatRequest, type InitialData, type Launch, type Priority, type Project, type ProjectBoard, type ProjectCatalogue, type Status, type Task, type TaskDetail } from '../types.js';
 import './styles.css';
 
@@ -28,6 +29,7 @@ function Dialog({ title, children, close, wide = false }: { title: string; child
     const selector = 'button:not(:disabled),input:not(:disabled),textarea:not(:disabled),select:not(:disabled),a[href],[tabindex="0"]';
     ref.current?.querySelector<HTMLElement>(selector)?.focus();
     const onKey = (event: KeyboardEvent) => {
+      if (document.querySelector('dialog[open]')) return;
       if (event.key === 'Escape') { event.stopPropagation(); close(); }
       if (event.key === 'Tab') {
         const nodes = Array.from(ref.current?.querySelectorAll<HTMLElement>(selector) || []).filter(el => el.getClientRects().length);
@@ -220,8 +222,9 @@ function Threadboard() {
   const [launches, setLaunches] = useState<Record<string, Launch>>({});
   const searchRef = useRef<HTMLInputElement>(null), selectedProject = useRef<string | null>(null), selectedBoard = useRef<string | null>(null), inFlight = useRef(false);
   const liveRevision = useRef<string | undefined>(undefined), interaction = useRef(0), liveChecking = useRef(false);
-  const liveView = useRef({ board, detail, busy, loading, dragOver });
-  liveView.current = { board, detail, busy, loading, dragOver };
+  const taskRead = useRef(0);
+  const liveView = useRef({ board, detail, busy, loading, dragOver, newBoard, newTaskStatus });
+  liveView.current = { board, detail, busy, loading, dragOver, newBoard, newTaskStatus };
   const notify = (message: string) => setToast(message);
   useEffect(() => {
     let alive = true;
@@ -265,17 +268,7 @@ function Threadboard() {
         let next: Board | null = null, nextDetail: TaskDetail | null = null;
         if (snapshot.board && projects.some(project => project.id === snapshot.board!.project.id)) {
           const args = { projectId: snapshot.board.project.id, boardId: snapshot.board.board.id, archived };
-          let refreshed: Board = await call<Board>('get_board', args);
-          // Keep pages the user already loaded. Retry if a writer changes the
-          // database between pages, rather than combining different snapshots.
-          const wanted = Math.max(200, Math.ceil(snapshot.board.tasks.length / 200) * 200);
-          while (refreshed.nextOffset !== null && refreshed.tasks.length < wanted) {
-            if (!current()) return;
-            const more: Board = await call<Board>('get_board', { ...args, offset: refreshed.nextOffset });
-            if (more.revision !== refreshed.revision) return;
-            refreshed = { ...more, tasks: [...refreshed.tasks, ...more.tasks] };
-          }
-          next = refreshed;
+          next = await readBoardPages(offset => call<Board>('get_board', { ...args, offset }), snapshot.board.tasks.length);
           if (!current()) return;
           if (snapshot.detail) nextDetail = await call<TaskDetail>('get_task', { projectId: args.projectId, taskId: snapshot.detail.task.id });
         }
@@ -303,15 +296,17 @@ function Threadboard() {
     const keyboard = (event: KeyboardEvent) => {
       if (newBoard || newTaskStatus || detail) return;
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); searchRef.current?.focus(); return; }
-      if (['INPUT','TEXTAREA','SELECT'].includes((event.target as HTMLElement)?.tagName)) return;
+      if (event.metaKey || event.ctrlKey || event.altKey || event.repeat || busy || loading) return;
+      if ((event.target as HTMLElement)?.closest('input,textarea,select,[contenteditable="true"],[role="menu"]')) return;
       if (event.key.toLowerCase() === 'n' && board) { event.preventDefault(); setNewTaskStatus('backlog'); }
     };
     document.addEventListener('keydown', keyboard); return () => document.removeEventListener('keydown', keyboard);
-  }, [board, newBoard, newTaskStatus, detail]);
+  }, [board, newBoard, newTaskStatus, detail, busy, loading]);
 
   async function load(projectId: string, showArchive = archived, boardId = selectedBoard.current) {
     const epoch = ++interaction.current;
-    const next = await call<Board>('get_board', { projectId, ...(boardId ? { boardId } : {}), archived: showArchive });
+    const wanted = board?.board.id === boardId && archived === showArchive ? board.tasks.length : 200;
+    const next = await readBoardPages(offset => call<Board>('get_board', { projectId, ...(boardId ? { boardId } : {}), archived: showArchive, offset }), wanted);
     if (interaction.current === epoch && selectedProject.current === projectId && selectedBoard.current === boardId) { liveRevision.current = next.revision; selectedBoard.current = next.board.id; setBoard(next); }
     return next;
   }
@@ -398,8 +393,39 @@ function Threadboard() {
     finally { inFlight.current = false; setBusy(false); }
   }
   async function openTask(task: Task) {
-    interaction.current++;
-    try { setDetail(await call('get_task', { projectId: task.projectId, taskId: task.id })); } catch (error: any) { notify(error.message); }
+    const epoch = ++interaction.current, request = ++taskRead.current;
+    const current = () => request === taskRead.current && epoch === interaction.current
+      && selectedProject.current === task.projectId && selectedBoard.current === task.boardId
+      && !liveView.current.newBoard && !liveView.current.newTaskStatus;
+    try {
+      const next = await call<TaskDetail>('get_task', { projectId: task.projectId, taskId: task.id });
+      if (current()) setDetail(next);
+    } catch (error: any) { if (current()) notify(error.message); }
+  }
+  function closeTask() {
+    taskRead.current++; interaction.current++; setDetail(null);
+  }
+  async function switchArchive(showArchive: boolean) {
+    if (!board || inFlight.current || loading || archived === showArchive) return;
+    setLoading(true); setArchived(showArchive); setError('');
+    const pending = load(board.project.id, showArchive), epoch = interaction.current;
+    try { await pending; }
+    catch (error: any) { if (epoch === interaction.current) { setArchived(archived); setError(error.message); } }
+    finally { if (epoch === interaction.current) setLoading(false); }
+  }
+  async function loadMore() {
+    if (!board || board.nextOffset === null || inFlight.current) return;
+    inFlight.current = true; setBusy(true);
+    const epoch = ++interaction.current;
+    try {
+      const args = { projectId: board.project.id, boardId: board.board.id, archived };
+      const more = await call<Board>('get_board', { ...args, offset: board.nextOffset });
+      const next = more.revision === board.revision
+        ? { ...more, tasks: [...board.tasks, ...more.tasks] }
+        : await readBoardPages(offset => call<Board>('get_board', { ...args, offset }), board.tasks.length + 200);
+      if (epoch === interaction.current) { liveRevision.current = next.revision; setBoard(next); }
+    } catch (error: any) { notify(error.message); }
+    finally { inFlight.current = false; setBusy(false); }
   }
   async function move(task: Task, status: Status) {
     if (!board || task.status === status || busy) return;
@@ -425,41 +451,41 @@ function Threadboard() {
   const doneRatio = board?.total ? Math.round((board.counts.done / board.total) * 100) : 0;
   const activeProject = projects.find(project => project.id === projectId);
 
-  return <div className="app-shell">
-    <aside className="sidebar">
+  return <div className="app-shell" onDragEnd={() => setDragOver(null)}>
+    <aside className="sidebar" inert={Boolean(detail || newBoard || newTaskStatus)}>
       <button className={`project-nav overview-nav ${!projectId ? 'selected' : ''}`} aria-label="Your boards" aria-current={!projectId ? 'page' : undefined} title="Your boards" disabled={busy} onClick={() => showOverview()}><Kanban size={16} /><span className="project-name">Your boards</span></button>
       <div className="sidebar-label">Projects</div>
       <nav aria-label="Project boards">{projects.map(p => <button key={p.id} aria-label={`${p.name}, ${p.taskCount} tasks`} aria-current={projectId === p.id ? 'page' : undefined} title={p.name} className={`project-nav ${projectId === p.id ? 'selected' : ''}`} onClick={() => showOverview(p.id)} disabled={busy}><FolderOpen size={16} /><span className="project-name">{p.name}</span><span className="project-count">{p.taskCount}</span></button>)}</nav>
       {!projects.length && <p className="sidebar-empty">Projects you create in Codex will appear here.</p>}
-      <div className="sidebar-bottom"><span><LockKeyhole size={14} />Stored on this device</span><p>No account. No cloud sync.</p></div>
+      <div className="sidebar-bottom"><span><LockKeyhole size={14} />Stored on this device</span><p>No cloud sync.</p></div>
     </aside>
-    <main className="workspace"><header className="topbar"><nav className="breadcrumb" aria-label="Breadcrumb"><button disabled={busy} onClick={() => showOverview()}>Your boards</button>{activeProject && <><ChevronRight size={14} />{board ? <button className="breadcrumb-project" title={activeProject.name} disabled={busy} onClick={() => showOverview(activeProject.id)}>{activeProject.name}</button> : <strong>{activeProject.name}</strong>}</>}{board && <><ChevronRight size={14} /><strong title={board.board.name}>{board.board.name}</strong></>}</nav><div className="topbar-right"><span className="local-indicator"><LockKeyhole size={12} />Local</span>{!window.__THREADBOARD_PREVIEW__ && <button className="icon-button" aria-label="Open full view" title="Open full view" disabled={busy || loading || openingFullView} onClick={() => void expandBoard()}><Maximize2 size={16} /></button>}<button className="icon-button" aria-label="Refresh board" disabled={busy || loading} onClick={() => void refresh()}><RefreshCw size={16} className={busy ? 'spin' : ''} /></button></div></header>
+    <main className="workspace" inert={Boolean(detail || newBoard || newTaskStatus)}><header className="topbar"><nav className="breadcrumb" aria-label="Breadcrumb"><button disabled={busy} onClick={() => showOverview()}>Your boards</button>{activeProject && <><ChevronRight size={14} />{board ? <button className="breadcrumb-project" title={activeProject.name} disabled={busy} onClick={() => showOverview(activeProject.id)}>{activeProject.name}</button> : <strong>{activeProject.name}</strong>}</>}{board && <><ChevronRight size={14} /><strong title={board.board.name}>{board.board.name}</strong></>}</nav><div className="topbar-right"><span className="local-indicator"><LockKeyhole size={12} />Local</span>{!window.__THREADBOARD_PREVIEW__ && <button className="icon-button" aria-label="Open full view" title="Open full view" disabled={busy || loading || openingFullView} onClick={() => void expandBoard()}><Maximize2 size={16} /></button>}<button className="icon-button" aria-label="Refresh board" disabled={busy || loading} onClick={() => void refresh()}><RefreshCw size={16} className={busy ? 'spin' : ''} /></button></div></header>
       {error && <div className="error-banner" role="alert"><span>{error}</span><button onClick={() => void refresh()} disabled={busy}>Retry</button><button className="icon-button small" aria-label="Dismiss error" onClick={() => setError('')}><X size={14} /></button></div>}
       {loading ? <div className="loading-state"><div className="skeleton-title" /><div className="skeleton-board">{[0,1,2,3,4].map(n => <div key={n}><div className="skeleton-card" /><div className="skeleton-card" /></div>)}</div></div> : !board ? projects.length ? <BoardOverview projects={projects} boards={boards} projectId={projectId} busy={busy} open={(projectId, boardId) => void openBoard(projectId, boardId)} selectProject={showOverview} create={() => setNewBoard(true)} /> : <div className="welcome"><div className="welcome-icon"><Kanban size={34} strokeWidth={1.5} /></div><h1>No Codex projects yet</h1><p>Create a project in Codex, then refresh to see its boards here.</p><button className="button" disabled={busy} onClick={() => void refresh()}><RefreshCw size={15} />Refresh projects</button></div> : <>
         <section className="board-heading"><div><h1>{board.project.name}</h1><p>{board.total - board.counts.done} open {board.total - board.counts.done === 1 ? 'task' : 'tasks'}<span>·</span>{board.counts.review} ready for review</p></div><div className="heading-actions"><button className="button" aria-label="Export board" onClick={() => void download()}><Download size={15} /><span>Export</span></button><button className="button primary" disabled={busy} onClick={() => setNewTaskStatus('backlog')}><Plus size={16} />New task<kbd>N</kbd></button></div></section>
         <div className="board-selector-row"><label className="board-picker"><Kanban size={15} /><span>Board</span><SelectControl aria-label="Select board" value={board.board.id} disabled={busy || loading} onChange={event => void selectBoard(event.target.value)}>{board.boards.map(item => <option key={item.id} value={item.id}>{item.name} · {item.taskCount}</option>)}</SelectControl></label><button className="button quiet" disabled={busy} onClick={() => setNewBoard(true)}><Plus size={14} />New board</button><button className="button board-chat-button" disabled={busy} onClick={() => void setupBoardChat()}><MessageSquare size={14} />{board.board.threadId ? 'Open board chat' : board.board.chatRequestId ? 'Finish chat setup' : 'Create board chat'}</button></div>
-        <div className="board-toolbar"><div className="view-tabs"><button className={!archived ? 'active' : ''} disabled={busy} onClick={async () => { setArchived(false); await load(board.project.id, false); }}><Kanban size={14} />Board</button><button className={archived ? 'active' : ''} disabled={busy} onClick={async () => { setArchived(true); await load(board.project.id, true); }}><Archive size={14} />Archive</button></div>
+        <div className="board-toolbar"><div className="view-tabs"><button className={!archived ? 'active' : ''} disabled={busy} aria-pressed={!archived} onClick={() => void switchArchive(false)}><Kanban size={14} />Board</button><button className={archived ? 'active' : ''} disabled={busy} aria-pressed={archived} onClick={() => void switchArchive(true)}><Archive size={14} />Archive</button></div>
           <div className="filters"><SelectControl className="filter-select" aria-label="Filter tasks" value={filter} onChange={e => setFilter(e.target.value as any)}><option value="all">All tasks</option><option value="priority">High priority</option><option value="unassigned">Unassigned</option></SelectControl><label className="search"><Search size={15} /><input ref={searchRef} aria-label="Search tasks" placeholder="Find a task…" value={query} onChange={e => setQuery(e.target.value)} /><kbd>⌘ K</kbd></label></div>
         </div>
-        {board.total === 0 && !archived && <div className="first-task-banner"><Sparkles size={18} /><div><strong>Start with one clear task.</strong><p>Add a goal and acceptance criteria so any chat can pick it up.</p></div><button className="button" onClick={() => setNewTaskStatus('backlog')}><Plus size={14} />Add a task</button></div>}
+        {board.total === 0 && !archived && <div className="first-task-banner"><Plus size={18} /><div><strong>Add your first task.</strong><p>Describe the work and how you’ll check the result.</p></div><button className="button" disabled={busy} onClick={() => setNewTaskStatus('backlog')}><Plus size={14} />Add a task</button></div>}
         <div className="kanban-board" role="region" aria-label="Kanban board">{STATUSES.map(status => {
           const Icon = statusIcon[status], columnTasks = tasks.filter(t => t.status === status);
           return <section className={`column column-${status} ${dragOver === status ? 'drag-over' : ''}`} key={status} aria-label={STATUS_LABELS[status]}
             onDragOver={event => { if (!archived) { event.preventDefault(); setDragOver(status); } }} onDragLeave={event => { if (!event.currentTarget.contains(event.relatedTarget as Node)) setDragOver(null); }}
             onDrop={event => { event.preventDefault(); setDragOver(null); const taskId = event.dataTransfer.getData('text/threadboard-task'); const target = board.tasks.find(t => t.id === taskId); if (target && !archived) void move(target, status); }}>
-            <div className="column-heading"><Icon size={15} /><h2>{STATUS_LABELS[status]}</h2><span className="column-count">{columnTasks.length}</span>{!archived && ['backlog','ready'].includes(status) && <button className="icon-button small" aria-label={`Add task to ${STATUS_LABELS[status]}`} onClick={() => setNewTaskStatus(status)}><Plus size={15} /></button>}</div>
+            <div className="column-heading"><Icon size={15} /><h2>{STATUS_LABELS[status]}</h2><span className="column-count">{columnTasks.length}</span>{!archived && ['backlog','ready'].includes(status) && <button className="icon-button small" aria-label={`Add task to ${STATUS_LABELS[status]}`} disabled={busy} onClick={() => setNewTaskStatus(status)}><Plus size={15} /></button>}</div>
             <div className="column-cards">{columnTasks.map(t => <TaskCard key={t.id} task={t} open={() => void openTask(t)} move={s => void move(t, s)} busy={busy} archived={archived} />)}
-              {!columnTasks.length && <div className="column-empty"><span className={`status-dot ${status}`} /><p>{query || filter !== 'all' ? 'No matching tasks' : status === 'backlog' ? 'Ideas start here' : status === 'ready' ? 'Ready for the next chat' : status === 'in_progress' ? 'Claim a task to begin' : status === 'review' ? 'Results come back here' : 'A little progress, every day'}</p></div>}
-            </div>{!archived && ['backlog','ready'].includes(status) && <button className="column-add" onClick={() => setNewTaskStatus(status)}><Plus size={14} />Add task</button>}
+              {!columnTasks.length && <div className="column-empty"><span className={`status-dot ${status}`} /><p>{query || filter !== 'all' ? 'No matching tasks' : archived ? 'No archived tasks' : status === 'backlog' ? 'No tasks planned' : status === 'ready' ? 'No tasks ready' : status === 'in_progress' ? 'No tasks in progress' : status === 'review' ? 'Nothing awaiting review' : 'No completed tasks'}</p></div>}
+            </div>{!archived && ['backlog','ready'].includes(status) && <button className="column-add" disabled={busy} onClick={() => setNewTaskStatus(status)}><Plus size={14} />Add task</button>}
           </section>;
         })}</div>
-        {board.nextOffset !== null && <div className="load-more"><button className="button" disabled={busy} onClick={async () => { interaction.current++; setBusy(true); try { const more = await call<Board>('get_board', { projectId: board.project.id, boardId: board.board.id, offset: board.nextOffset, archived }); if (selectedProject.current === more.project.id && selectedBoard.current === more.board.id) setBoard({ ...more, tasks: [...board.tasks, ...more.tasks] }); } catch (error: any) { notify(error.message); } finally { setBusy(false); } }}><ArrowDown size={14} />Load more tasks ({board.tasks.length} of {board.total})</button></div>}
+        {board.nextOffset !== null && <div className="load-more"><button className="button" disabled={busy} onClick={() => void loadMore()}><ArrowDown size={14} />Load more tasks ({board.tasks.length} of {board.total})</button></div>}
         <footer className="board-footer"><span><LockKeyhole size={12} />Local board<span className="footer-dot">·</span><span title={liveError ? 'Automatic updates are retrying. You can also refresh manually.' : 'Checks local changes once per second while visible.'}>{liveError ? 'Reconnecting…' : 'Live'}</span></span><div className="progress-summary"><span>{doneRatio}% complete</span><div className="progress-track"><i style={{ width: `${doneRatio}%` }} /></div><span>{board.counts.done}/{board.total}</span></div></footer>
       </>}
     </main>
     {newBoard && activeProject && <NewBoardDialog projectName={activeProject.name} close={() => setNewBoard(false)} busy={busy} create={createBoard} />}
     {newTaskStatus && board && <NewTaskDialog initialStatus={newTaskStatus} close={() => setNewTaskStatus(null)} busy={busy} create={async values => { const result = await action('create_task', { projectId: board.project.id, boardId: board.board.id, ...values }); if (result) { setNewTaskStatus(null); notify(`${shortId(result.task)} created.`); } }} />}
-    {detail && board && <TaskDialog key={detail.task.id} detail={detail} project={board.project} projectBoard={board.board} close={() => setDetail(null)} busy={busy} action={action} launch={launches[detail.task.id]} startChat={startChat} notify={notify} allTasks={board.tasks} reload={() => openTask(detail.task)} />}
+    {detail && board && <TaskDialog key={detail.task.id} detail={detail} project={board.project} projectBoard={board.board} close={closeTask} busy={busy} action={action} launch={launches[detail.task.id]} startChat={startChat} notify={notify} allTasks={board.tasks} reload={() => openTask(detail.task)} />}
     {toast && <div className="toast" role="status" aria-live="polite"><span>{toast}</span><button className="icon-button small" aria-label="Dismiss notification" onClick={() => setToast('')}><X size={14} /></button></div>}
   </div>;
 }

@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="dark light" />
-    <title>Threadboard — Many chats. One clear plan.</title>
+    <title>Threadboard — Task boards inside Codex</title>
     <meta
       name="description"
       content="A local task board inside Codex. Give each card a goal, hand it to a chat, and bring the work back for review. Free, open source, and stored on your device."
@@ -13,11 +13,11 @@
     <meta property="og:type" content="website" />
     <meta
       property="og:title"
-      content="Threadboard — Many chats. One clear plan."
+      content="Threadboard — Task boards inside Codex"
     />
     <meta
       property="og:description"
-      content="Your Codex projects, a shared task board, and a clear path from a brief to your review. All on your device."
+      content="Plan tasks, assign them to Codex chats, and review the results. Your boards stay on your device."
     />
     <meta property="og:url" content="https://threadboard.vrnrn.com/" />
     <meta
@@ -27,7 +27,7 @@
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="theme-color" content="#19171b" />
+    <meta name="theme-color" content="#181818" />
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
     <link
       rel="preload"
@@ -132,14 +132,14 @@
       <section class="hero wrap" aria-labelledby="hero-title">
         <div class="hero-copy">
           <p class="eyebrow">
-            <span class="status-dot"></span> A local board. Inside Codex.
+            <span class="status-dot"></span> For Codex desktop
           </p>
           <h1 id="hero-title">
-            Many chats.<br />One clear <span class="ink-underline">plan.</span>
+            Task boards.<br />Inside Codex.
           </h1>
           <p class="hero-description">
-            Give each card a goal, hand it to a chat, and bring the work back
-            for review. Threadboard keeps the whole project in view.
+            Plan your project, start a chat from a task, and review the result
+            on the same card. Your boards stay on your device.
           </p>
           <div class="hero-actions">
             <a class="button primary" href="#install"
@@ -149,7 +149,7 @@
             >
           </div>
           <p class="hero-facts">
-            Open source <span>·</span> No board account <span>·</span> Stored
+            Open source <span>·</span> Free to use <span>·</span> Stored
             locally
           </p>
         </div>
@@ -205,22 +205,22 @@
           <p>
             <span class="note-number">01</span
             ><span
-              ><strong>Know what’s next.</strong> Goals, priorities, and
+              ><strong>Plan the task.</strong> Goals, priorities, and
               prerequisites live on the card.</span
             >
           </p>
           <p>
             <span class="note-number">02</span
             ><span
-              ><strong>Know who has it.</strong> A claim gives one chat
+              ><strong>Assign a chat.</strong> A claim gives one chat
               ownership of the task.</span
             >
           </p>
           <p>
             <span class="note-number">03</span
             ><span
-              ><strong>Know what came back.</strong> Results wait in Review
-              until you make the call.</span
+              ><strong>Review the result.</strong> Read the changes and checks,
+              then accept the work or request changes.</span
             >
           </p>
         </div>
@@ -231,9 +231,9 @@
         aria-labelledby="workflow-title"
       >
         <div class="section-heading">
-          <p class="eyebrow">THE HANDOFF, WITHOUT THE HUNT</p>
+          <p class="eyebrow">How it works</p>
           <h2 id="workflow-title">
-            A task can outlive<br />the chat that started it.
+            From task<br />to finished work.
           </h2>
           <p>
             Keep the brief, the owner, and the result in one place. Here’s the
@@ -258,7 +258,7 @@
                 <span class="step-index">01</span
                 ><span
                   ><strong>Ready</strong
-                  ><small>Make the outcome clear.</small></span
+                  ><small>Write the goal and checks.</small></span
                 ><svg class="icon"><use href="#arrow" /></svg>
               </button>
               <button
@@ -273,7 +273,7 @@
                 <span class="step-index">02</span
                 ><span
                   ><strong>In progress</strong
-                  ><small>Give one chat the work.</small></span
+                  ><small>Start work in a chat.</small></span
                 ><svg class="icon"><use href="#arrow" /></svg>
               </button>
               <button
@@ -303,7 +303,7 @@
                 <span class="step-index">04</span
                 ><span
                   ><strong>Done</strong
-                  ><small>Accept it. Keep the record.</small></span
+                  ><small>Accept the completed work.</small></span
                 ><svg class="icon"><use href="#arrow" /></svg>
               </button>
             </div>
@@ -362,7 +362,7 @@
               </p>
             </div>
             <span class="example-label mono"
-              >ILLUSTRATED HANDOFF / EXAMPLE TASK</span
+              >Example task</span
             >
           </div>
         </div>
@@ -373,7 +373,7 @@
       >
         <div class="wrap review-grid">
           <div class="review-image">
-            <div class="corner-label mono">THE RESULT HAS A HOME</div>
+            <div class="corner-label mono">Task review</div>
             <button
               class="image-button"
               type="button"
@@ -388,11 +388,11 @@
                 loading="lazy"
                 alt="An actual task review dialog: an installation goal, acceptance criteria, Release chat ownership, validation notes, and Accept into Done and Request changes controls."
               /></button
-            ><span class="image-stamp">Your review<br />is a real step.</span>
+            >
           </div>
           <div class="review-copy">
-            <p class="eyebrow">A FINISHED CHAT ISN’T THE FINISH LINE</p>
-            <h2 id="review-title">Read the result.<br />Make the call.</h2>
+            <p class="eyebrow">Review</p>
+            <h2 id="review-title">See what changed.<br />Decide what’s done.</h2>
             <p>
               A chat submits its work with a short progress note and the checks
               it ran. You can see the brief and the result together.
@@ -404,8 +404,8 @@
               ><span class="decision">↩ Request changes</span>
             </div>
             <p class="subtle">
-              Threadboard moves on deliberate task updates. It doesn’t read your
-              conversation history or guess whether a chat is finished.
+              The chat adds notes to the card and submits its result for review.
+              Threadboard does not read your conversation history.
             </p>
             <a
               class="text-link"
@@ -422,9 +422,9 @@
       >
         <div class="projects-heading">
           <div>
-            <p class="eyebrow">PROJECT FIRST, BOARD SECOND</p>
+            <p class="eyebrow">Your projects</p>
             <h2 id="projects-title">
-              Your projects.<br />Room for every kind of work.
+              One project.<br />As many boards as you need.
             </h2>
           </div>
           <p>
@@ -481,11 +481,11 @@
       >
         <div class="wrap">
           <div class="local-heading">
-            <p class="eyebrow">SMALL FOOTPRINT. CLEAR BOUNDARIES.</p>
+            <p class="eyebrow">Local storage</p>
             <h2 id="local-title">The board lives<br />on your machine.</h2>
             <p>
-              No hosted board service. No board account. Your tasks live in a
-              local SQLite database, separate from the replaceable plugin files.
+              Your tasks are saved on your device. Plugin updates and
+              uninstalling Threadboard leave your boards intact.
             </p>
           </div>
           <figure class="local-diagram">
@@ -525,8 +525,8 @@
               </div>
             </div>
             <figcaption>
-              Threadboard stores task content, chat references, and deliberate
-              updates. It does not open transcript files. Task information you
+              Threadboard stores your tasks, notes, and chat links locally.
+              Task information you
               choose to use in a chat still goes through your normal Codex
               account and model service.
             </figcaption>
@@ -534,7 +534,7 @@
           <div class="local-details">
             <div>
               <span class="detail-icon">↻</span>
-              <h3>Changes without the churn.</h3>
+              <h3>Updates while you work.</h3>
               <p>
                 A visible board checks a small local revision once a second.
                 Cards reload after a change. Hidden panels pause, and open
@@ -552,7 +552,7 @@
             </div>
             <div>
               <span class="detail-icon">⌘</span>
-              <h3>Built for your workspace.</h3>
+              <h3>Keyboard and theme support.</h3>
               <p>
                 Use the keyboard, work in a narrow panel, and follow your Codex
                 theme. Threadboard stays beside the chats doing the work.
@@ -566,8 +566,8 @@
         aria-labelledby="faq-title"
       >
         <div>
-          <p class="eyebrow">BEFORE YOU INSTALL</p>
-          <h2 id="faq-title">A few good questions.</h2>
+          <p class="eyebrow">Requirements</p>
+          <h2 id="faq-title">Before you install.</h2>
           <p class="faq-intro">
             Threadboard is an open-source preview. Here’s what it does today.
           </p>
@@ -593,7 +593,7 @@
               <strong>Start in new chat</strong> opens Codex with a prepared
               task prompt. Send it to begin. You can also ask an existing chat
               to claim a card. A claim gives one chat ownership; it does not
-              quietly dispatch model turns in the background.
+              start work until you send the prompt.
             </p>
           </details>
           <details>
@@ -657,11 +657,11 @@
       >
         <div class="wrap install-grid">
           <div class="install-copy">
-            <p class="eyebrow">MAKE ROOM FOR YOUR NEXT TASK</p>
-            <h2 id="install-title">Put a board<br />behind the work.</h2>
+            <p class="eyebrow">Install</p>
+            <h2 id="install-title">Add Threadboard<br />to Codex.</h2>
             <p>
-              Install the preview. Open Threadboard in Codex. Your projects are
-              already waiting.
+              Download the preview or install with the Codex CLI. Open
+              Threadboard from the sidebar to find your projects.
             </p>
             <a
               class="button download-button"
@@ -778,11 +778,11 @@
       <section class="open-source-section wrap">
         <svg class="icon"><use href="#mark" /></svg>
         <div>
-          <h2>Built in the open.</h2>
-          <p>Read the code, try the preview, or help decide what comes next.</p>
+          <h2>Free and open source.</h2>
+          <p>Read the source, report a bug, or contribute a fix.</p>
         </div>
         <a class="text-link" href="https://github.com/vrnrn/Threadboard"
-          >Explore the repository
+          >View on GitHub
           <svg class="icon"><use href="#arrow-up" /></svg
         ></a>
       </section>
@@ -816,7 +816,7 @@
         <img id="large-image" width="1512" height="982" alt="" />
       </div>
       <div class="image-dialog-bottom">
-        <span>Actual interface / example projects</span
+        <span>Example projects</span
         ><a
           id="full-image-link"
           href="/assets/board-dark.png"

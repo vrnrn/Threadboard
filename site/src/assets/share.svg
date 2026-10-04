@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="../styles.css"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" font-family="Instrument Sans, Arial, sans-serif">
-  <rect width="1200" height="630" fill="#19171b"/>
-  <g transform="translate(60 49)"><rect width="43" height="43" rx="10" fill="#ded0ee"/><g fill="none" stroke="#352d3e" stroke-width="1.6" stroke-linecap="round"><rect x="9" y="9" width="25" height="25" rx="5"/><path d="M16 14v15m6-15v9m6-9v12"/></g><text x="57" y="29" fill="#f1ede9" font-size="29" font-weight="600" letter-spacing="-.9">Threadboard</text></g>
-  <text x="1140" y="75" text-anchor="end" fill="#968a9d" font-size="13">threadboard.vrnrn.com</text>
-  <text x="60" y="195" fill="#b2a9b7" font-family="monospace" font-size="11" letter-spacing="1.5">A LOCAL BOARD. INSIDE CODEX.</text>
-  <g fill="#f1ede9" font-size="77" font-weight="500" letter-spacing="-4"><text x="56" y="284">Many chats.</text><text x="56" y="366">One clear</text><text x="56" y="448">plan.</text></g>
-  <path d="M61 468q117 4 183-6" fill="none" stroke="#ded0ee" stroke-width="2"/>
-  <text x="60" y="523" fill="#b2a9b7" font-size="19">Plan a task. Hand it to a chat.</text><text x="60" y="552" fill="#b2a9b7" font-size="19">Review what comes back.</text>
-  <g transform="translate(550 155)"><rect width="765" height="529" rx="14" fill="#2b2730" stroke="#443c4a"/><image href="board-dark.png" x="8" y="8" width="749" height="486.5" preserveAspectRatio="xMinYMin meet"/><rect x="35" y="405" width="242" height="66" rx="7" fill="#edc9b5" transform="rotate(-4 35 405)"/><text x="56" y="446" fill="#352d3e" font-size="17" font-weight="500" transform="rotate(-4 35 405)">Ready for your review.</text><circle cx="250" cy="432" r="12" fill="#352d3e" transform="rotate(-4 35 405)"/><path d="m244 432 4 4 8-8" fill="none" stroke="#edc9b5" stroke-width="1.5" transform="rotate(-4 35 405)"/></g>
+  <rect width="1200" height="630" fill="#181818"/>
+  <g transform="translate(60 49)"><rect width="43" height="43" rx="10" fill="#e9dfcf"/><g fill="none" stroke="#2d2b26" stroke-width="1.6" stroke-linecap="round"><rect x="9" y="9" width="25" height="25" rx="5"/><path d="M16 14v15m6-15v9m6-9v12"/></g><text x="57" y="29" fill="#f2eee7" font-size="29" font-weight="600" letter-spacing="-.9">Threadboard</text></g>
+  <text x="1140" y="75" text-anchor="end" fill="#a09b93" font-size="13">threadboard.vrnrn.com</text>
+  <text x="60" y="195" fill="#b6b2aa" font-family="monospace" font-size="11" letter-spacing="1.5">FOR CODEX DESKTOP</text>
+  <g fill="#f2eee7" font-size="77" font-weight="500" letter-spacing="-4"><text x="56" y="284">Task boards.</text><text x="56" y="366">Inside</text><text x="56" y="448">Codex.</text></g>
+  <text x="60" y="523" fill="#b6b2aa" font-size="19">Plan a task. Hand it to a chat.</text><text x="60" y="552" fill="#b6b2aa" font-size="19">Review what comes back.</text>
+  <g transform="translate(550 155)"><rect width="765" height="529" rx="14" fill="#292929" stroke="#41413f"/><image href="board-dark.png" x="8" y="8" width="749" height="486.5" preserveAspectRatio="xMinYMin meet"/></g>
 </svg>

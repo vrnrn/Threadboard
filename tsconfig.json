@@ -12,5 +12,5 @@
     "types": ["node"],
     "noEmit": true
   },
-  "include": ["src", "tests", "scripts", "playwright*.config.ts"]
+  "include": ["src", "tests", "scripts", "playwright*.config.ts", "site/src/demo"]
 }

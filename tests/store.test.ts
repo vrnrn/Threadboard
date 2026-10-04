@@ -99,6 +99,51 @@ test('archiving preserves content and runs, and board pagination never silently 
   } finally { f.cleanup(); }
 });
 
+test('a no-op move and a same-column reorder preserve a prepared chat', () => {
+  const f = fixture(); try {
+    const task = f.create();
+    const launch = invoke(f.store, 'prepare_task_launch', { projectId: f.project.id, taskId: task.id, version: task.version, ...freshClaim() });
+    const args = { projectId: f.project.id, taskId: task.id, version: launch.task.version, status: 'ready' as const };
+    const revision = f.store.revision();
+    assert.deepEqual(f.store.move(args), launch.task);
+    assert.equal(f.store.revision(), revision);
+    const reordered = f.store.move({ ...args, rank: 10 });
+    assert.equal(reordered.rank, 10);
+    assert.equal(reordered.run?.state, 'launching');
+    assert.equal(f.store.bind({ projectId: f.project.id, runId: launch.run.id, token: launch.token, owner: 'Chat' }).task.status, 'in_progress');
+  } finally { f.cleanup(); }
+});
+
+test('review cards show the newest submission even when run timestamps are identical', () => {
+  const f = fixture(); try {
+    let task = f.create();
+    for (const owner of ['First chat', 'Second chat']) {
+      const claim = f.store.claim({ projectId: f.project.id, taskId: task.id, version: task.version, owner, ...freshClaim() });
+      task = f.store.note({ projectId: f.project.id, taskId: task.id, runId: claim.run.id, token: claim.token, note: owner, submit: true }).task;
+      if (owner === 'First chat') task = f.store.move({ projectId: f.project.id, taskId: task.id, version: task.version, status: 'ready' });
+    }
+    f.store.db.prepare('UPDATE runs SET created_at=? WHERE task_id=?').run('2026-01-01T00:00:00.000Z', task.id);
+    assert.equal(f.store.detail(f.project.id, task.id).task.run?.owner, 'Second chat');
+    assert.equal(f.store.board(f.project.id).tasks[0].run?.owner, 'Second chat');
+  } finally { f.cleanup(); }
+});
+
+test('binding a prepared chat rechecks blockers and prerequisites added after reservation', () => {
+  const f = fixture(); try {
+    const task = f.create(), prerequisite = f.create('Required first');
+    const launch = invoke(f.store, 'prepare_task_launch', { projectId: f.project.id, taskId: task.id, version: task.version, ...freshClaim() });
+    const bind = () => f.store.bind({ projectId: f.project.id, runId: launch.run.id, token: launch.token, owner: 'Chat' });
+    const blocked = f.store.edit({ projectId: f.project.id, taskId: task.id, version: launch.task.version, blockedReason: 'Waiting for input' });
+    assert.throws(bind, code('BLOCKED'));
+    assert.equal(f.store.detail(f.project.id, task.id).task.run?.state, 'launching');
+    const cleared = f.store.edit({ projectId: f.project.id, taskId: task.id, version: blocked.version, blockedReason: '' });
+    f.store.dependency({ projectId: f.project.id, taskId: task.id, version: cleared.version, prerequisiteId: prerequisite.id });
+    assert.throws(bind, code('PREREQUISITE'));
+    f.store.move({ projectId: f.project.id, taskId: prerequisite.id, version: prerequisite.version, status: 'done' });
+    assert.equal(bind().task.status, 'in_progress');
+  } finally { f.cleanup(); }
+});
+
 test('API schemas reject extra fields, empty titles, and projects not created in Codex', () => {
   const f = fixture(); try {
     assert.throws(() => invoke(f.store, 'create_task', { projectId: f.project.id, title: ' ', operationId: randomUUID() }));
