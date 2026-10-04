@@ -8,7 +8,7 @@ const version = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).ver
 const name = `threadboard-${version}`, output = join(root, 'release'), stage = join(output, name);
 mkdirSync(output, { recursive: true });
 rmSync(stage, { recursive: true, force: true }); mkdirSync(stage);
-for (const relative of ['.agents/plugins/marketplace.json','plugins/threadboard','README.md','PRIVACY.md','LICENSE','THIRD_PARTY_NOTICES.md','docs/board.png']) {
+for (const relative of ['.agents/plugins/marketplace.json','plugins/threadboard','README.md','RELEASE_NOTES.md','PRIVACY.md','LICENSE','THIRD_PARTY_NOTICES.md','docs']) {
   mkdirSync(dirname(join(stage, relative)), { recursive: true }); cpSync(join(root, relative), join(stage, relative), { recursive: true });
 }
 cpSync(join(root, 'scripts/install.mjs'), join(stage, 'install.mjs'));

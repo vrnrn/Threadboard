@@ -1,3 +1,22 @@
+# Release notes
+
+## Current source preview — 0.1.4-dev.6
+
+The source preview uses native Codex projects, supports multiple boards within each project, and reflects explicit task updates from other chats automatically. The latest downloadable GitHub package remains `0.1.1`; these changes do not create a new release or imply an OpenAI directory listing.
+
+- Existing Codex projects receive empty General boards. Project creation, naming, and removal stay in Codex.
+- Your boards is a real overview grouped by project. Project clicks open a board picker; the sidebar and breadcrumbs provide paths back.
+- Named boards have isolated cards, archives, dependencies, and exports, with task numbers unique across the project. Board creation can request a companion chat in its native project.
+- Visible boards check an opaque local revision once per second. Reloads preserve drafts and loaded pages, pause while hidden, and back off after errors.
+- Host theme and font variables apply initially and as they change. Neutral controls, dropdown spacing, keyboard menus, narrow panels, and long text have been reviewed in light and dark appearances.
+- Version/content-specific UI resources bust stale caches. Valid cached board resource URLs still resolve through the running server, fixing mixed discovery/read connections after updates.
+- Open full view requests the sidebar app through an app deep link, carrying only project/board IDs and archive state. Incoming links preserve open drafts; invalid or removed destinations fail gracefully.
+- The repository now has current named-board demonstrations, a shorter product README, focused usage/development guides, matching SVG banners, a social image, and reproducible product captures.
+
+Validation: 26 backend tests and 22 UI tests pass. Clean installation and the `0.1.4-dev.5` → `0.1.4-dev.6` upgrade preserve task data. Native board opening is confirmed locally. Full-view recovery and card-launch project placement still require native-host verification. The compiled UI remains below the 250 KiB gzip budget; documentation graphics are not runtime assets.
+
+## Published preview — 0.1.1
+
 Threadboard 0.1.1 is a fully local preview for Codex desktop. It includes a compiled board, stdio MCP server, workflow skill, and one-command installer. No hosted service, account, telemetry, or separate model API is required.
 
 Download `threadboard-0.1.1.zip`, extract it, and run `node install.mjs` in the extracted directory. Reopen Codex and open Threadboard from your installed plugins. Node.js 22.13+ and the Codex CLI are required; no npm installation or build step is needed. The same installer updates an existing installation while preserving task data. Check the ZIP against `SHA256SUMS` if desired. See the [installation guide](https://github.com/vrnrn/Threadboard#install-a-release).

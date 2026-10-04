@@ -58,7 +58,7 @@ try {
     if (result.error || result.status !== 0) throw new Error(result.stderr?.trim() || result.error?.message || 'The Codex plugin command failed.');
   }
   if (existsSync(backup)) rmSync(backup, { recursive: true, force: true });
-  console.log(`Threadboard ${manifest.version} installed. Reopen Codex and open Threadboard from your installed plugins.\nPlugin files: ${target}\nTask data is stored separately and survives plugin updates.`);
+  console.log(`Threadboard ${manifest.version} installed. Close the Threadboard panel, fully quit Codex, then reopen it and open Threadboard from your installed plugins.\nPlugin files: ${target}\nTask data is stored separately and survives plugin updates.`);
 } catch (error) {
   if (existsSync(backup)) { if (existsSync(target)) rmSync(target, { recursive: true, force: true }); renameSync(backup, target); }
   fail(`Installation did not complete: ${error.message}\nYour task database was not changed. Resolve the CLI error and rerun the installer.`);

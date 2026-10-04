@@ -6,14 +6,17 @@ import { spawnSync } from 'node:child_process';
 import { performance } from 'node:perf_hooks';
 import { Store } from '../src/store.js';
 import { seedPerformance } from '../tests/performance-fixture.js';
+import { writeNativeProjects } from '../tests/native-fixture.js';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 const directory = mkdtempSync(join(tmpdir(), 'threadboard-populated-'));
 const store = new Store(directory);
 const { project } = seedPerformance(store, join(directory, 'workspace'), 2000, 5000, 'Populated board');
+const codexDirectory = join(directory, 'codex');
+writeNativeProjects(codexDirectory, [{ id: project.id, name: project.name, rootPaths: project.rootPaths }]);
 store.close();
 const client = new Client({ name: 'populated-runtime-benchmark', version: '1' });
-const transport = new StdioClientTransport({ command: process.execPath, args: ['./dist/server.mjs'], cwd: fileURLToPath(new URL('../plugins/threadboard/', import.meta.url)), env: { ...process.env, THREADBOARD_DATA_DIR: directory }, stderr: 'pipe' });
+const transport = new StdioClientTransport({ command: process.execPath, args: ['./dist/server.mjs'], cwd: fileURLToPath(new URL('../plugins/threadboard/', import.meta.url)), env: { ...process.env, THREADBOARD_DATA_DIR: directory, THREADBOARD_CODEX_HOME: codexDirectory }, stderr: 'pipe' });
 const memory: number[] = [], samples: number[] = [];
 try {
   await client.connect(transport);

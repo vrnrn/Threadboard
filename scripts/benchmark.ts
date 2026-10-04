@@ -4,10 +4,11 @@ import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
 import { Store } from '../src/store.js';
+import { fixtureBoard } from '../tests/native-fixture.js';
 const directory = mkdtempSync(join(tmpdir(), 'threadboard-benchmark-'));
 const store = new Store(join(directory, 'data'));
 try {
-  const project = store.createProject('Benchmark', directory);
+  const project = fixtureBoard(store, 'Benchmark', directory);
   for (let i = 0; i < 2000; i++) store.createTask({ projectId: project.id, title: `Representative task ${i}`, description: 'Local context. '.repeat(550), criteria: 'Check the result. '.repeat(200), operationId: randomUUID() });
   const samples: number[] = [];
   let bytes = 0;

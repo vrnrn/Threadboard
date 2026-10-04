@@ -25,6 +25,8 @@ jobs:
       - run: npm run benchmark:concurrency
       - run: npm run benchmark:populated
       - run: npm run benchmark:ui
+      - run: npm run benchmark:live
+      - run: npm run graphics
       - run: npm run release:check
       - run: npm run release:pack
       - run: npm install --global @openai/codex@0.157.1

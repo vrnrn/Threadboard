@@ -9,9 +9,19 @@ Threadboard stores tasks and deliberate progress notes locally. Use its MCP tool
 
 ## Select a board
 
-Call `list_projects` and match the current workspace to its registered canonical root. Use the exact returned project ID. If the user wants a board for an unregistered workspace, call `create_project` with its existing absolute directory and a short name. This associates a local board with a workspace; it does not create a saved native Codex project. Call `open_project_board` to show the board inside Codex.
+Call `list_projects` to discover existing local Codex projects, including projects with no tasks. Use the exact native project ID returned by the tool. Match the current workspace against `rootPaths`; if multiple projects share it, select the project the user requested instead of guessing. Project IDs are opaque strings, not necessarily UUIDs. Call `list_boards` for that project, then `open_project_board` with projectId and boardId to show a named board inside Codex. Omitting boardId selects General, never all boards.
 
-Use `get_board` for bounded summaries. Follow `nextOffset` to see additional tasks. Use `get_task` for full content and the latest 50 deliberate notes. IDs and versions come from tools; never invent them.
+Projects are created, renamed, and removed in Codex itself. Threadboard cannot create independent projects. If the workspace is missing from the list, explain that it must first be saved as a project in Codex, then refresh. Removing a Codex project hides its board while retaining saved tasks.
+
+The native board chat may receive selected-board context with projectId, boardId, their names, and a workspace. Use both exact IDs as the default selection for a requested board operation, while honoring any project the user explicitly specifies. This context does not change native chat membership or the shell's working directory. Do not claim a task merely because the board is selected or the user says hello.
+
+Supply boardId on `open_project_board`, `get_board`, `create_task`, and `export_board`. Other card actions use projectId and taskId; do not add unsupported fields. Use `get_board` with the selected boardId for bounded summaries. Follow `nextOffset` to see additional tasks. Use `get_task` for full content and the latest 50 deliberate notes. IDs and versions come from tools; never invent them.
+
+## Companion chats
+
+Each project can contain named boards. `create_board` returns the board and one companion chat setup request. When the user requests a board with its companion chat, or sends the UI-generated setup prompt, use Codex's native `list_projects` and `create_thread` tools to create “<board name> Threadboard” in the exact native project, with a local environment. Never use projectless creation or infer project membership from the workspace path. If these tools are unavailable, leave setup pending and explain how to send the setup prompt in the Codex desktop app.
+
+Read `list_boards` first. If threadId is set, use that chat. For an interrupted or uncertain request, check native `list_threads` for the exact title and project ID before retrying creation. Only one request is reserved; shouldCreate=false means creation has already been requested or completed, not permission to silently create another chat. Explicit Finish chat setup authorizes recovery after this check. Ask the new companion chat to acknowledge and wait without claiming cards or changing files. Verify native project membership, then call `bind_board_chat` with the returned threadId and the exact projectId, boardId, and requestId. If binding fails after successful creation, retry the binding only. Store no transcript.
 
 ## Work in an existing chat
 
@@ -29,7 +39,7 @@ When the launch prompt contains `projectId`, `runId`, and `token`, call `bind_ta
 
 ## Board changes
 
-- Create cards with a clear goal and acceptance criteria. Use a stable UUID `operationId` to avoid duplicates on retries. Start in Backlog or Ready.
+- Create cards with the selected boardId, a clear goal and acceptance criteria. Use a stable UUID `operationId` to avoid duplicates on retries. Start in Backlog or Ready.
 - Use the most recently read version for edits, moves, dependencies, archiving, and release. On a version conflict, read the new version and reconcile the user's intended edit; do not blindly overwrite another chat's work.
 - Use `link_dependency` for same-board prerequisites. Cycles are rejected. Do not mark a prerequisite Done just to bypass it.
 - Reserve a new chat with `prepare_task_launch` only when the user requests a new chat. The returned desktop link opens a workspace chat with a prefilled prompt; the user sends it. Never promise automatic sending, silently open duplicate chats, or claim native project placement without evidence.

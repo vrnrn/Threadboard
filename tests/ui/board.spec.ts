@@ -1,8 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
-import { mkdtempSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 
 async function api(page: Page, name: string, args: Record<string, unknown> = {}) {
   const html = await (await page.request.get('/')).text();
@@ -13,20 +12,20 @@ async function api(page: Page, name: string, args: Record<string, unknown> = {})
   return body.data;
 }
 
-async function workspace(page: Page) {
-  const root = mkdtempSync(join(tmpdir(), 'threadboard-ui-workspace-'));
-  const name = `Workspace ${randomUUID().slice(0, 8)}`;
-  const { project } = await api(page, 'create_project', { name, root });
+async function workspace(page: Page, number: number) {
+  const name = `UI workspace ${number}`;
+  const project = (await api(page, 'list_projects')).projects.find((p: any) => p.name === name);
   await page.goto('/');
   if (await page.getByRole('heading', { name, exact: true }).count() === 0) {
-    await page.getByRole('navigation', { name: 'Project boards' }).getByRole('button', { name: new RegExp(name) }).click();
+    await page.getByRole('navigation', { name: 'Project boards' }).getByRole('button', { name: new RegExp(`^${name},`) }).click();
   }
+  await page.getByRole('button', { name: `Open General, ${name}, ${project.taskCount} tasks`, exact: true }).click();
   await expect(page.getByRole('heading', { name, exact: true })).toBeVisible();
-  return { project, cleanup: () => rmSync(root, { recursive: true, force: true }) };
+  return { project, cleanup: () => {} }; // The preview process owns and removes fixture directories.
 }
 
 test('create, edit, note, move, archive and restore survive a reload', async ({ page }) => {
-  const w = await workspace(page);
+  const w = await workspace(page, 1);
   try {
     await page.getByRole('button', { name: 'New task N', exact: true }).click();
     const form = page.getByRole('dialog', { name: 'New task', exact: true });
@@ -58,13 +57,14 @@ test('create, edit, note, move, archive and restore survive a reload', async ({ 
     await page.getByRole('button', { name: 'Close dialog', exact: true }).click();
     await page.getByRole('button', { name: 'Board', exact: true }).click();
     await page.reload();
-    await page.getByRole('navigation', { name: 'Project boards' }).getByRole('button', { name: new RegExp(w.project.name) }).click();
+    await page.getByRole('navigation', { name: 'Project boards' }).getByRole('button', { name: new RegExp(`^${w.project.name},`) }).click();
+    await page.getByRole('button', { name: /^Open General,/ }).click();
     await expect(page.getByRole('region', { name: 'Ready', exact: true }).getByTestId('task-1')).toBeVisible();
   } finally { w.cleanup(); }
 });
 
 test('a conflicting save preserves the draft and can reload the latest content', async ({ page }) => {
-  const w = await workspace(page);
+  const w = await workspace(page, 2);
   try {
     const { task } = await api(page, 'create_task', { projectId: w.project.id, title: 'Original title', operationId: randomUUID() });
     await page.getByRole('button', { name: 'Refresh board', exact: true }).click();
@@ -84,7 +84,7 @@ test('a conflicting save preserves the draft and can reload the latest content',
 });
 
 test('manual refresh sees claimed progress, submission requires explicit acceptance', async ({ page }) => {
-  const w = await workspace(page);
+  const w = await workspace(page, 3);
   try {
     const { task } = await api(page, 'create_task', { projectId: w.project.id, title: 'Owner workflow', status: 'ready', operationId: randomUUID() });
     const token = randomUUID() + randomUUID();
@@ -100,7 +100,7 @@ test('manual refresh sees claimed progress, submission requires explicit accepta
 });
 
 test('keyboard focus stays in dialogs and task text cannot inject HTML', async ({ page }) => {
-  const w = await workspace(page);
+  const w = await workspace(page, 4);
   try {
     await api(page, 'create_task', { projectId: w.project.id, title: '<img src=x onerror=alert(1)>', description: '<script>alert(1)</script>', operationId: randomUUID() });
     await page.getByRole('button', { name: 'Refresh board', exact: true }).click();
@@ -111,6 +111,8 @@ test('keyboard focus stays in dialogs and task text cannot inject HTML', async (
     await expect(dialog.getByRole('button', { name: 'Close dialog', exact: true })).toBeFocused();
     await page.keyboard.press('Shift+Tab');
     await expect(dialog.getByRole('button', { name: 'Cancel', exact: true })).toBeFocused();
+    await page.keyboard.press('ControlOrMeta+k');
+    await expect(dialog.getByRole('button', { name: 'Cancel', exact: true })).toBeFocused();
     await page.keyboard.press('Escape');
     await expect(dialog).toBeHidden();
     await page.keyboard.press('ControlOrMeta+k');
@@ -118,19 +120,102 @@ test('keyboard focus stays in dialogs and task text cannot inject HTML', async (
   } finally { w.cleanup(); }
 });
 
-test('idle boards do not poll or load remote assets, and remain usable on small screens', async ({ page }) => {
+test('idle visible boards only check revisions, load no remote assets, and remain usable on small screens', async ({ page }) => {
   const external: string[] = [];
   page.on('request', request => { if (!request.url().startsWith('http://127.0.0.1:4389')) external.push(request.url()); });
-  const w = await workspace(page);
+  const w = await workspace(page, 5);
   try {
-    let calls = 0;
-    page.on('request', request => { if (request.url().endsWith('/api')) calls++; });
+    const calls: string[] = [];
+    page.on('request', request => { if (request.url().endsWith('/api')) calls.push(request.postDataJSON().name); });
     await page.waitForTimeout(2200); // Deliberately measure idle traffic.
-    expect(calls).toBe(0); expect(external).toEqual([]);
+    expect(calls.length).toBeGreaterThanOrEqual(2); expect(calls.length).toBeLessThanOrEqual(3);
+    expect(calls.every(name => name === 'get_board_revision')).toBe(true); expect(external).toEqual([]);
     await page.setViewportSize({ width: 390, height: 844 });
     await expect(page.getByRole('button', { name: /^New task/ })).toBeVisible();
     await page.getByRole('button', { name: /^New task/ }).click();
     await expect(page.getByRole('dialog')).toBeVisible();
     await expect(page.getByRole('textbox', { name: 'Title', exact: true })).toBeVisible();
   } finally { w.cleanup(); }
+});
+
+test('existing Codex projects start empty and refresh native renames and removals', async ({ page }) => {
+  const { projects } = await api(page, 'list_projects');
+  const project = projects.find((p: any) => p.name === 'UI workspace 8');
+  expect(project.taskCount).toBe(0);
+  expect(project.root).toContain('threadboard-ui-data-');
+  const registry = join(dirname(dirname(project.root)), 'codex', '.codex-global-state.json');
+  const original = readFileSync(registry, 'utf8');
+  const state = JSON.parse(original);
+  try {
+    await page.goto('/');
+    const nav = page.getByRole('navigation', { name: 'Project boards' });
+    await expect(nav.getByRole('button')).toHaveCount(10);
+    await expect(page.getByRole('button', { name: /Add project/ })).toHaveCount(0);
+    await nav.getByRole('button', { name: 'UI workspace 8, 0 tasks', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'UI workspace 8', exact: true })).toBeVisible();
+    await expect(page.locator('.task-card')).toHaveCount(0);
+    await expect(page.getByRole('region', { name: 'Board picker', exact: true })).toBeVisible();
+    await page.getByRole('button', { name: /^Open General,/ }).click();
+    await expect(page.getByRole('region', { name: 'Kanban board', exact: true })).toBeVisible();
+    await api(page, 'create_task', { projectId: project.id, title: 'Native project work', operationId: randomUUID() });
+    state['local-projects'][project.id].name = 'Renamed in Codex';
+    writeFileSync(registry, JSON.stringify(state));
+    await page.getByRole('button', { name: 'Refresh board', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Renamed in Codex', exact: true })).toBeVisible();
+    await expect(nav.getByRole('button', { name: 'Renamed in Codex, 1 tasks', exact: true })).toBeVisible();
+    await expect(page.getByTestId('task-1')).toContainText('Native project work');
+    delete state['local-projects'][project.id];
+    writeFileSync(registry, JSON.stringify(state));
+    await page.getByRole('button', { name: 'Refresh board', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Your boards', exact: true })).toBeVisible();
+    await expect(nav.getByRole('button')).toHaveCount(9);
+    await expect(page.getByRole('alert')).toHaveCount(0);
+    writeFileSync(registry, original);
+    await page.getByRole('button', { name: 'Refresh board', exact: true }).click();
+    await nav.getByRole('button', { name: 'UI workspace 8, 1 tasks', exact: true }).click();
+    await page.getByRole('button', { name: /^Open General,/ }).click();
+    await expect(page.getByTestId('task-1')).toContainText('Native project work');
+  } finally { writeFileSync(registry, original); }
+});
+
+test('long activity names and last-card menus fit narrow panels and remain keyboard usable', async ({ page }) => {
+  const w = await workspace(page, 5);
+  const { board } = await api(page, 'create_board', { projectId: w.project.id, name: 'Control regression checks', operationId: randomUUID() });
+  const args = { projectId: w.project.id, boardId: board.id };
+  const { task: owned } = await api(page, 'create_task', { ...args, title: 'Long owner name', status: 'ready', operationId: randomUUID() });
+  await api(page, 'claim_task', { projectId: w.project.id, taskId: owned.id, version: owned.version, attemptId: randomUUID(), token: randomUUID() + randomUUID(), owner: 'OwnerWithAnUnbrokenNameThatMustStayInsideTheTaskActivityPanel' });
+  let last: any;
+  for (let index = 0; index < 8; index++) last = (await api(page, 'create_task', { ...args, title: `Menu check ${index}`, operationId: randomUUID() })).task;
+  await page.getByRole('button', { name: 'Refresh board', exact: true }).click();
+  await page.getByRole('combobox', { name: 'Select board', exact: true }).selectOption(board.id);
+  await page.setViewportSize({ width: 320, height: 844 });
+  await page.getByTestId(`task-${owned.number}`).getByRole('button', { name: 'Long owner name', exact: true }).click();
+  const detail = page.getByRole('dialog');
+  await expect(detail).toBeVisible();
+  expect(await detail.evaluate(element => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
+  const priority = detail.getByRole('combobox', { name: 'Priority', exact: true });
+  await priority.focus();
+  await page.keyboard.press('u');
+  await expect(priority).toHaveValue('urgent');
+  await page.keyboard.press('Escape');
+  const trigger = page.getByRole('button', { name: `Move TB-${last.number}`, exact: true });
+  await trigger.click();
+  const menu = page.getByRole('menu');
+  await expect(menu).toBeVisible();
+  const done = page.getByRole('menuitem', { name: 'Done', exact: true });
+  expect(await done.evaluate(element => {
+    const rect = element.getBoundingClientRect();
+    return element.contains(document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2));
+  })).toBe(true);
+  await page.keyboard.press('End');
+  await expect(done).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(menu).toHaveCount(0);
+  await expect(trigger).toBeFocused();
+  await page.keyboard.press('ArrowDown');
+  await expect(page.getByRole('menuitem', { name: 'Ready', exact: true })).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(menu).toHaveCount(0);
+  await expect(page.getByRole('region', { name: 'Ready', exact: true }).getByTestId(`task-${last.number}`)).toBeVisible();
+  expect((await api(page, 'get_task', { projectId: w.project.id, taskId: last.id })).task.status).toBe('ready');
 });

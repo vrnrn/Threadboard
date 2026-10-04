@@ -9,12 +9,15 @@ import { fileURLToPath } from 'node:url';
 import { Store } from '../src/store.js';
 import { invoke, freshClaim } from '../src/api.js';
 import { BoardError } from '../src/types.js';
+import { nativeProject } from './native-fixture.js';
 
 function fixture() {
   const root = mkdtempSync(join(tmpdir(), 'threadboard-test-'));
   const directory = join(root, 'data');
-  const store = new Store(directory);
-  const project = store.createProject('Test workspace', root);
+  const records = [nativeProject('Test workspace', root)];
+  const store = new Store(directory, { list: () => records });
+  store.syncProjects(records);
+  const project = store.projects()[0];
   const create = (title = 'A clear goal') => store.createTask({ projectId: project.id, title, criteria: 'A verifiable result', status: 'ready', operationId: randomUUID() });
   const cleanup = () => { store.close(); rmSync(root, { recursive: true, force: true }); };
   return { root, directory, store, project, create, cleanup };
@@ -96,12 +99,13 @@ test('archiving preserves content and runs, and board pagination never silently 
   } finally { f.cleanup(); }
 });
 
-test('API schemas reject extra fields, empty titles, unsupported states, and missing directories', () => {
+test('API schemas reject extra fields, empty titles, and projects not created in Codex', () => {
   const f = fixture(); try {
     assert.throws(() => invoke(f.store, 'create_task', { projectId: f.project.id, title: ' ', operationId: randomUUID() }));
     assert.throws(() => invoke(f.store, 'list_projects', { transcript: 'do not accept chat data' }));
-    assert.throws(() => f.store.createProject('Missing', join(f.root, 'not-there')), code('INVALID_DIRECTORY'));
-    assert.throws(() => invoke(f.store, 'open_project_board', { root: join(f.root, 'unregistered') }), code('PROJECT_NOT_REGISTERED'));
+    assert.throws(() => invoke(f.store, 'create_project', { name: 'Not allowed', root: f.root }), code('UNKNOWN_TOOL'));
+    assert.throws(() => invoke(f.store, 'open_project_board', { root: join(f.root, 'unregistered') }), code('PROJECT_NOT_IN_CODEX'));
+    assert.throws(() => invoke(f.store, 'create_task', { projectId: randomUUID(), title: 'Unknown project', operationId: randomUUID() }), code('PROJECT_NOT_IN_CODEX'));
     assert.equal(f.store.projects().length, 1);
   } finally { f.cleanup(); }
 });

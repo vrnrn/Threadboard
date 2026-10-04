@@ -11,7 +11,7 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 const version = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).version;
 const temporary = mkdtempSync(join(tmpdir(), 'threadboard-install-check-'));
 const configDirectory = join(temporary, 'codex'), installed = join(temporary, 'marketplace'), data = join(temporary, 'data');
-const env = { ...process.env, CODEX_HOME: configDirectory, THREADBOARD_INSTALL_DIR: installed, THREADBOARD_DATA_DIR: data };
+const env = { ...process.env, CODEX_HOME: configDirectory, THREADBOARD_CODEX_HOME: configDirectory, THREADBOARD_INSTALL_DIR: installed, THREADBOARD_DATA_DIR: data };
 const run = (command, args) => {
   const result = spawnSync(command, args, { env, encoding: 'utf8' });
   if (result.error || result.status !== 0) throw new Error(result.stderr || result.error?.message || result.stdout);
@@ -32,6 +32,9 @@ const cachedTransport = (expectedVersion = version) => {
 };
 try {
   mkdirSync(configDirectory, { recursive: true }); mkdirSync(data);
+  const nativeId = 'native-installation-project';
+  const native = { id: nativeId, name: 'Installed package', rootPaths: [temporary] };
+  writeFileSync(join(configDirectory, '.codex-global-state.json'), JSON.stringify({ 'local-projects': { [nativeId]: native } }));
   const sentinel = join(data, 'update-preserves-data.txt'); writeFileSync(sentinel, 'Task data stays outside the plugin cache.');
   const installer = join(root, 'release', `threadboard-${version}`, 'install.mjs');
   const initialRelease = process.env.THREADBOARD_PREVIOUS_RELEASE;
@@ -40,9 +43,13 @@ try {
   const transport = cachedTransport(initialVersion);
   client = new Client({ name: 'installed-package-check', version: '1.0' }); await client.connect(transport);
   assert.equal(client.getServerVersion().version, initialVersion);
-  const result = await client.callTool({ name: 'create_project', arguments: { name: 'Installed package', root: temporary } });
+  const tools = await client.listTools();
+  const previousUiUri = tools.tools.find(tool => tool.name === 'open_project_board')._meta['ui/resourceUri'];
+  const result = await client.callTool(tools.tools.some(tool => tool.name === 'create_project')
+    ? { name: 'create_project', arguments: { name: 'Installed package', root: temporary } }
+    : { name: 'list_projects', arguments: {} });
   assert.equal(result.isError, undefined);
-  const projectId = result.structuredContent.project.id;
+  const projectId = result.structuredContent.project?.id || result.structuredContent.projects[0].id;
   const task = await client.callTool({ name: 'create_task', arguments: { projectId, title: 'Survive a plugin update', operationId: 'bf6d345e-e92e-4b02-a22e-4f6f201fd3dc' } });
   const taskId = task.structuredContent.task.id;
   await client.close(); client = undefined;
@@ -51,7 +58,15 @@ try {
   client = new Client({ name: 'update-package-check', version: '1.0' });
   await client.connect(cachedTransport());
   assert.equal(client.getServerVersion().version, version);
+  const cachedUi = await client.readResource({ uri: previousUiUri });
+  assert.equal(cachedUi.contents[0].uri, previousUiUri);
+  assert.equal(cachedUi.contents[0].mimeType, 'text/html;profile=mcp-app');
+  assert.ok(cachedUi.contents[0].text.includes('board-overview'));
+  const projects = await client.callTool({ name: 'list_projects', arguments: {} });
+  assert.equal(projects.structuredContent.projects[0].id, nativeId);
+  assert.equal((await client.listTools()).tools.some(tool => tool.name === 'create_project'), false);
   const restored = await client.callTool({ name: 'get_task', arguments: { projectId, taskId } });
   assert.equal(restored.structuredContent.task.title, 'Survive a plugin update');
-  console.log(`Clean Codex installation, cached MCP execution, ${initialVersion} to ${version}, and task persistence passed.`);
+  assert.equal(restored.structuredContent.task.projectId, nativeId);
+  console.log(`Clean Codex installation, cached MCP execution, ${initialVersion} to ${version}, cached UI URLs, and task persistence passed.`);
 } finally { if (client) await client.close(); rmSync(temporary, { recursive: true, force: true }); }

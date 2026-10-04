@@ -9,7 +9,7 @@ test('measure useful rendering with 2,000 active and 5,000 archived cards at 4x 
     const original = window.fetch;
     window.fetch = async (...args) => {
       const response = await original(...args), json = response.json.bind(response);
-      response.json = async () => { const data = await json(); if (data.data?.board) metrics.dataReady = performance.now(); return data; };
+      response.json = async () => { const data = await json(); if (data.data?.tasks) metrics.dataReady = performance.now(); return data; };
       return response;
     };
     const observer = new MutationObserver(() => {
@@ -22,6 +22,7 @@ test('measure useful rendering with 2,000 active and 5,000 archived cards at 4x 
   const samples: number[] = [], longTasks: number[] = [];
   for (let i = 0; i < 20; i++) {
     if (i === 0) await page.goto('/'); else await page.reload();
+    await page.getByRole('button', { name: 'Open General, Performance board, 2000 tasks', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Performance board', exact: true })).toBeVisible();
     await expect.poll(() => page.evaluate(() => (window as any).__THREADBOARD_PERFORMANCE__.firstPaint)).toBeGreaterThan(0);
     const metrics = await page.evaluate(() => (window as any).__THREADBOARD_PERFORMANCE__);

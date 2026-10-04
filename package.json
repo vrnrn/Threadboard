@@ -1,6 +1,6 @@
 {
   "name": "threadboard",
-  "version": "0.1.1",
+  "version": "0.1.4-dev.6",
   "private": true,
   "type": "module",
   "description": "A fully local Kanban board inside Codex.",
@@ -14,12 +14,14 @@
     "test": "tsx --test tests/*.test.ts",
     "test:ui": "playwright test",
     "screenshots": "playwright test --config playwright.screenshots.config.ts",
+    "graphics": "npm run screenshots && node scripts/render-graphics.mjs",
     "dev": "tsx src/preview.ts",
     "benchmark": "tsx scripts/benchmark.ts",
     "benchmark:startup": "node scripts/benchmark-startup.mjs",
     "benchmark:concurrency": "tsx scripts/benchmark-concurrency.ts",
     "benchmark:populated": "tsx scripts/benchmark-populated.ts",
     "benchmark:ui": "playwright test --config playwright.performance.config.ts",
+    "benchmark:live": "tsx scripts/benchmark-live.ts",
     "release:check": "node scripts/release-check.mjs",
     "release:pack": "node scripts/release.mjs",
     "test:install": "node scripts/check-install.mjs"

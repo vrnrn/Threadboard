@@ -1,8 +1,11 @@
 import { randomUUID } from 'node:crypto';
 import type { Store } from '../src/store.js';
+import { fixtureBoard } from './native-fixture.js';
 
 export function seedDemo(store: Store, root: string) {
-  const project = store.createProject('Orbit', root);
+  const project = fixtureBoard(store, 'Orbit', root);
+  const product = store.createBoard({ projectId: project.id, name: 'Product', operationId: randomUUID() });
+  const release = store.createBoard({ projectId: project.id, name: 'Release', operationId: randomUUID() });
   const cards = [
     ['Make onboarding feel effortless', 'Help a new user get from installation to their first useful task. Keep the flow short and make each next step clear.', 'backlog', 'high', ''],
     ['Add quick filters to the board', 'Find high-priority work and unassigned tasks without leaving the board.', 'backlog', 'low', ''],
@@ -12,10 +15,10 @@ export function seedDemo(store: Store, root: string) {
     ['Make conflicting edits safe', 'Preserve unsaved drafts when another chat changes a task.', 'in_progress', 'normal', 'Interface chat'],
     ['Package a one-command installation', 'Ship the compiled board, server, workflow skill, and licenses together.', 'review', 'high', 'Release chat'],
     ['Verify atomic task ownership', 'Race independent processes for a card and keep exactly one owner.', 'review', 'normal', 'Testing chat'],
-    ['Keep idle boards quiet', 'Refresh after deliberate actions and avoid periodic polling.', 'done', 'normal', 'Performance chat'],
+    ['Keep live updates lightweight', 'Check a small local revision while visible and reload cards only when the board changes.', 'done', 'normal', 'Performance chat'],
   ] as const;
   for (const [title, description, status, priority, owner] of cards) {
-    let task = store.createTask({ projectId: project.id, title, description, criteria: 'The result is clear, usable, and covered by the appropriate checks.', status: status === 'backlog' ? 'backlog' : 'ready', priority, operationId: randomUUID() });
+    let task = store.createTask({ projectId: project.id, boardId: product.id, title, description, criteria: 'The result is clear, usable, and covered by the appropriate checks.', status: status === 'backlog' ? 'backlog' : 'ready', priority, operationId: randomUUID() });
     if (['in_progress','review','done'].includes(status)) {
       const claim = store.claim({ projectId: project.id, taskId: task.id, version: task.version, owner, attemptId: randomUUID(), token: randomUUID() + randomUUID() });
       task = claim.task;
@@ -23,5 +26,10 @@ export function seedDemo(store: Store, root: string) {
       if (status === 'done') store.move({ projectId: project.id, taskId: task.id, version: task.version, status: 'done' });
     }
   }
+  for (const [title, status, priority] of [
+    ['Refresh the product screenshots', 'ready', 'high'],
+    ['Write the next release notes', 'backlog', 'normal'],
+    ['Verify the clean installation', 'ready', 'normal'],
+  ] as const) store.createTask({ projectId: project.id, boardId: release.id, title, status, priority, operationId: randomUUID() });
   return project;
 }
