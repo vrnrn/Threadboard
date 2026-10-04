@@ -1,0 +1,600 @@
+{
+  "projects": [
+    {
+      "id": "9c8ce42f-ad02-43b7-9bdd-9ed7aca12114",
+      "name": "Atlas",
+      "root": "/workspaces/atlas",
+      "rootPaths": [
+        "/workspaces/atlas"
+      ],
+      "revision": 0,
+      "taskCount": 0,
+      "doneCount": 0
+    },
+    {
+      "id": "23979a33-688a-4616-a53e-e7d756eba742",
+      "name": "Orbit",
+      "root": "/workspaces/orbit",
+      "rootPaths": [
+        "/workspaces/orbit"
+      ],
+      "revision": 21,
+      "taskCount": 12,
+      "doneCount": 1
+    },
+    {
+      "id": "cf23050c-8c67-4258-bd0e-88effbe47bd0",
+      "name": "Website",
+      "root": "/workspaces/website",
+      "rootPaths": [
+        "/workspaces/website"
+      ],
+      "revision": 1,
+      "taskCount": 1,
+      "doneCount": 0
+    }
+  ],
+  "boards": [
+    {
+      "id": "70f00240-f314-4fe7-9c3a-cc57e83b75e8",
+      "projectId": "23979a33-688a-4616-a53e-e7d756eba742",
+      "name": "General",
+      "isDefault": true,
+      "taskCount": 0,
+      "doneCount": 0,
+      "threadId": null,
+      "chatRequestId": null,
+      "createdAt": "2026-10-04T22:52:37.074Z"
+    },
+    {
+      "id": "37176663-8c45-4012-9af9-3714246ea250",
+      "projectId": "cf23050c-8c67-4258-bd0e-88effbe47bd0",
+      "name": "General",
+      "isDefault": true,
+      "taskCount": 0,
+      "doneCount": 0,
+      "threadId": null,
+      "chatRequestId": null,
+      "createdAt": "2026-10-04T22:52:37.081Z"
+    },
+    {
+      "id": "c5b093ee-0bee-49a8-93db-d937d8bd1474",
+      "projectId": "9c8ce42f-ad02-43b7-9bdd-9ed7aca12114",
+      "name": "General",
+      "isDefault": true,
+      "taskCount": 0,
+      "doneCount": 0,
+      "threadId": null,
+      "chatRequestId": null,
+      "createdAt": "2026-10-04T22:52:37.081Z"
+    },
+    {
+      "id": "b38a5ef6-2857-42f6-b6ef-8b0f8c8edadd",
+      "projectId": "23979a33-688a-4616-a53e-e7d756eba742",
+      "name": "Product",
+      "isDefault": false,
+      "taskCount": 9,
+      "doneCount": 1,
+      "threadId": null,
+      "chatRequestId": null,
+      "createdAt": "2026-10-04T22:52:37.075Z"
+    },
+    {
+      "id": "cdb3984e-7d20-4954-a696-e52727e6914a",
+      "projectId": "23979a33-688a-4616-a53e-e7d756eba742",
+      "name": "Release",
+      "isDefault": false,
+      "taskCount": 3,
+      "doneCount": 0,
+      "threadId": null,
+      "chatRequestId": null,
+      "createdAt": "2026-10-04T22:52:37.075Z"
+    },
+    {
+      "id": "a7108674-4695-4c9e-b7a8-99b3de22ad11",
+      "projectId": "cf23050c-8c67-4258-bd0e-88effbe47bd0",
+      "name": "Editorial",
+      "isDefault": false,
+      "taskCount": 1,
+      "doneCount": 0,
+      "threadId": null,
+      "chatRequestId": null,
+      "createdAt": "2026-10-04T22:52:37.081Z"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "30080e0a-e997-45a6-ab3e-dd3f77e328b5",
+      "projectId": "23979a33-688a-4616-a53e-e7d756eba742",
+      "boardId": "b38a5ef6-2857-42f6-b6ef-8b0f8c8edadd",
+      "number": 1,
+      "title": "Make onboarding feel effortless",
+      "description": "Help a new user get from installation to their first useful task. Keep the flow short and make each next step clear.",
+      "criteria": "Keep keyboard navigation working.\nVerify the changed behavior in the board.",
+      "status": "backlog",
+      "priority": "high",
+      "blockedReason": "",
+      "rank": 1024,
+      "version": 1,
+      "archived": false,
+      "createdAt": "2026-10-04T22:52:37.075Z",
+      "updatedAt": "2026-10-04T22:52:37.075Z",
+      "run": null,
+      "dependencies": []
+    },
+    {
+      "id": "af3904d0-6ada-4319-b569-b0607df1db47",
+      "projectId": "23979a33-688a-4616-a53e-e7d756eba742",
+      "boardId": "b38a5ef6-2857-42f6-b6ef-8b0f8c8edadd",
+      "number": 2,
+      "title": "Add quick filters to the board",
+      "description": "Find high-priority work and unassigned tasks without leaving the board.",
+      "criteria": "Keep keyboard navigation working.\nVerify the changed behavior in the board.",
+      "status": "backlog",
+      "priority": "low",
+      "blockedReason": "",
+      "rank": 2048,
+      "version": 1,
+      "archived": false,
+      "createdAt": "2026-10-04T22:52:37.076Z",
+      "updatedAt": "2026-10-04T22:52:37.076Z",
+      "run": null,
+      "dependencies": []
+    },
+    {
+      "id": "5da80601-1e04-49fe-a985-4dcdc89eb5f2",
+      "projectId": "23979a33-688a-4616-a53e-e7d756eba742",
+      "boardId": "b38a5ef6-2857-42f6-b6ef-8b0f8c8edadd",
+      "number": 3,
+      "title": "Make every action work with a keyboard",
+      "description": "Keep focus visible and provide a clear path through each dialog.",
+      "criteria": "Keep keyboard navigation working.\nVerify the changed behavior in the board.",
+      "status": "ready",
+      "priority": "normal",
+      "blockedReason": "",
+      "rank": 3072,
+      "version": 1,
+      "archived": false,
+      "createdAt": "2026-10-04T22:52:37.076Z",
+      "updatedAt": "2026-10-04T22:52:37.076Z",
+      "run": null,
+      "dependencies": []
+    },
+    {
+      "id": "ff070ab3-0c1a-4608-b137-752271a56e44",
+      "projectId": "23979a33-688a-4616-a53e-e7d756eba742",
+      "boardId": "b38a5ef6-2857-42f6-b6ef-8b0f8c8edadd",
+      "number": 4,
+      "title": "Polish the empty and error states",
+      "description": "Give every screen a useful next step, including interrupted launches.",
+      "criteria": "Keep keyboard navigation working.\nVerify the changed behavior in the board.",
+      "status": "ready",
+      "priority": "low",
+      "blockedReason": "",
+      "rank": 4096,
+      "version": 1,
+      "archived": false,
+      "createdAt": "2026-10-04T22:52:37.076Z",
+      "updatedAt": "2026-10-04T22:52:37.076Z",
+      "run": null,
+      "dependencies": []
+    },
+    {
+      "id": "540082ec-07aa-4556-9ff1-6830795d943f",
+      "projectId": "23979a33-688a-4616-a53e-e7d756eba742",
+      "boardId": "b38a5ef6-2857-42f6-b6ef-8b0f8c8edadd",
+      "number": 5,
+      "title": "Preserve tasks across plugin updates",
+      "description": "Store project data outside the replaceable plugin cache.",
+      "criteria": "Keep keyboard navigation working.\nVerify the changed behavior in the board.",
+      "status": "in_progress",
+      "priority": "high",
+      "blockedReason": "",
+      "rank": 5120,
+      "version": 2,
+      "archived": false,
+      "createdAt": "2026-10-04T22:52:37.076Z",
+      "updatedAt": "2026-10-04T22:52:37.077Z",
+      "run": {
+        "id": "7d930fb3-9c39-4280-ab04-f83fe3b13682",
+        "taskId": "540082ec-07aa-4556-9ff1-6830795d943f",
+        "state": "running",
+        "owner": "Storage chat",
+        "threadId": null,
+        "createdAt": "2026-10-04T22:52:37.077Z",
+        "expiresAt": null
+      },
+      "dependencies": []
+    },
+    {
+      "id": "2ea865e8-3bbc-4493-9bdb-bd85d1d36ff2",
+      "projectId": "23979a33-688a-4616-a53e-e7d756eba742",
+      "boardId": "b38a5ef6-2857-42f6-b6ef-8b0f8c8edadd",
+      "number": 6,
+      "title": "Make conflicting edits safe",
+      "description": "Preserve unsaved drafts when another chat changes a task.",
+      "criteria": "Keep keyboard navigation working.\nVerify the changed behavior in the board.",
+      "status": "in_progress",
+      "priority": "normal",
+      "blockedReason": "",
+      "rank": 6144,
+      "version": 2,
+      "archived": false,
+      "createdAt": "2026-10-04T22:52:37.077Z",
+      "updatedAt": "2026-10-04T22:52:37.077Z",
+      "run": {
+        "id": "a5b3a3bc-9f7f-43fd-af26-9adb0e509c49",
+        "taskId": "2ea865e8-3bbc-4493-9bdb-bd85d1d36ff2",
+        "state": "running",
+        "owner": "Interface chat",
+        "threadId": null,
+        "createdAt": "2026-10-04T22:52:37.077Z",
+        "expiresAt": null
+      },
+      "dependencies": []
+    },
+    {
+      "id": "2c33d5ff-6b8c-4b1c-8994-b66f6813b274",
+      "projectId": "23979a33-688a-4616-a53e-e7d756eba742",
+      "boardId": "b38a5ef6-2857-42f6-b6ef-8b0f8c8edadd",
+      "number": 7,
+      "title": "Package a one-command installation",
+      "description": "Ship the compiled board, server, workflow skill, and licenses together.",
+      "criteria": "Package versions agree.\nA clean Codex profile opens the board.\nUpgrading preserves existing tasks.",
+      "status": "review",
+      "priority": "high",
+      "blockedReason": "",
+      "rank": 7168,
+      "version": 3,
+      "archived": false,
+      "createdAt": "2026-10-04T22:52:37.077Z",
+      "updatedAt": "2026-10-04T22:52:37.078Z",
+      "run": {
+        "id": "7ca79b48-ee3b-48ff-aa36-c7a42d3c36e9",
+        "taskId": "2c33d5ff-6b8c-4b1c-8994-b66f6813b274",
+        "state": "submitted",
+        "owner": "Release chat",
+        "threadId": null,
+        "createdAt": "2026-10-04T22:52:37.078Z",
+        "expiresAt": null
+      },
+      "dependencies": []
+    },
+    {
+      "id": "7a7b49f1-7316-4606-b5e3-897445d7b94a",
+      "projectId": "23979a33-688a-4616-a53e-e7d756eba742",
+      "boardId": "b38a5ef6-2857-42f6-b6ef-8b0f8c8edadd",
+      "number": 8,
+      "title": "Verify atomic task ownership",
+      "description": "Race independent processes for a card and keep exactly one owner.",
+      "criteria": "100 claim requests produce exactly one owner.\nOther claimants receive a conflict without changing the card.",
+      "status": "review",
+      "priority": "normal",
+      "blockedReason": "",
+      "rank": 8192,
+      "version": 3,
+      "archived": false,
+      "createdAt": "2026-10-04T22:52:37.078Z",
+      "updatedAt": "2026-10-04T22:52:37.079Z",
+      "run": {
+        "id": "2ef09af9-d380-440c-966e-b9a06e44a11c",
+        "taskId": "7a7b49f1-7316-4606-b5e3-897445d7b94a",
+        "state": "submitted",
+        "owner": "Testing chat",
+        "threadId": null,
+        "createdAt": "2026-10-04T22:52:37.078Z",
+        "expiresAt": null
+      },
+      "dependencies": []
+    },
+    {
+      "id": "3bc4413d-87c4-4915-bd55-10d099610fea",
+      "projectId": "23979a33-688a-4616-a53e-e7d756eba742",
+      "boardId": "b38a5ef6-2857-42f6-b6ef-8b0f8c8edadd",
+      "number": 9,
+      "title": "Keep live updates lightweight",
+      "description": "Check a small local revision while visible and reload cards only when the board changes.",
+      "criteria": "Check only a local revision while visible.\nPause hidden panels.\nDo not refetch unchanged cards.",
+      "status": "done",
+      "priority": "normal",
+      "blockedReason": "",
+      "rank": 9216,
+      "version": 4,
+      "archived": false,
+      "createdAt": "2026-10-04T22:52:37.079Z",
+      "updatedAt": "2026-10-04T22:52:37.079Z",
+      "run": {
+        "id": "cb18b4dc-309a-46d4-97dc-555b15cad2ab",
+        "taskId": "3bc4413d-87c4-4915-bd55-10d099610fea",
+        "state": "submitted",
+        "owner": "Performance chat",
+        "threadId": null,
+        "createdAt": "2026-10-04T22:52:37.079Z",
+        "expiresAt": null
+      },
+      "dependencies": []
+    },
+    {
+      "id": "8c2077b8-0d7d-412f-8134-aae8e46ea8c9",
+      "projectId": "23979a33-688a-4616-a53e-e7d756eba742",
+      "boardId": "cdb3984e-7d20-4954-a696-e52727e6914a",
+      "number": 10,
+      "title": "Refresh the product screenshots",
+      "description": "",
+      "criteria": "",
+      "status": "ready",
+      "priority": "high",
+      "blockedReason": "",
+      "rank": 10240,
+      "version": 1,
+      "archived": false,
+      "createdAt": "2026-10-04T22:52:37.080Z",
+      "updatedAt": "2026-10-04T22:52:37.080Z",
+      "run": null,
+      "dependencies": []
+    },
+    {
+      "id": "e919ea3d-6434-432d-bb31-a404cb00160f",
+      "projectId": "23979a33-688a-4616-a53e-e7d756eba742",
+      "boardId": "cdb3984e-7d20-4954-a696-e52727e6914a",
+      "number": 11,
+      "title": "Write the next release notes",
+      "description": "",
+      "criteria": "",
+      "status": "backlog",
+      "priority": "normal",
+      "blockedReason": "",
+      "rank": 11264,
+      "version": 1,
+      "archived": false,
+      "createdAt": "2026-10-04T22:52:37.080Z",
+      "updatedAt": "2026-10-04T22:52:37.080Z",
+      "run": null,
+      "dependencies": []
+    },
+    {
+      "id": "eb799a1c-95c4-48fe-abd1-1151d8c2ba72",
+      "projectId": "23979a33-688a-4616-a53e-e7d756eba742",
+      "boardId": "cdb3984e-7d20-4954-a696-e52727e6914a",
+      "number": 12,
+      "title": "Verify the clean installation",
+      "description": "",
+      "criteria": "",
+      "status": "ready",
+      "priority": "normal",
+      "blockedReason": "",
+      "rank": 12288,
+      "version": 1,
+      "archived": false,
+      "createdAt": "2026-10-04T22:52:37.080Z",
+      "updatedAt": "2026-10-04T22:52:37.080Z",
+      "run": null,
+      "dependencies": []
+    },
+    {
+      "id": "dcedadc8-c1e0-47ef-9472-2fd16faf7ebf",
+      "projectId": "cf23050c-8c67-4258-bd0e-88effbe47bd0",
+      "boardId": "a7108674-4695-4c9e-b7a8-99b3de22ad11",
+      "number": 1,
+      "title": "Outline the product launch story",
+      "description": "",
+      "criteria": "",
+      "status": "backlog",
+      "priority": "normal",
+      "blockedReason": "",
+      "rank": 1024,
+      "version": 1,
+      "archived": false,
+      "createdAt": "2026-10-04T22:52:37.082Z",
+      "updatedAt": "2026-10-04T22:52:37.082Z",
+      "run": null,
+      "dependencies": []
+    }
+  ],
+  "events": {
+    "30080e0a-e997-45a6-ab3e-dd3f77e328b5": [
+      {
+        "id": 1,
+        "taskId": "30080e0a-e997-45a6-ab3e-dd3f77e328b5",
+        "kind": "created",
+        "actor": "You",
+        "note": "",
+        "createdAt": "2026-10-04T22:52:37.075Z"
+      }
+    ],
+    "af3904d0-6ada-4319-b569-b0607df1db47": [
+      {
+        "id": 2,
+        "taskId": "af3904d0-6ada-4319-b569-b0607df1db47",
+        "kind": "created",
+        "actor": "You",
+        "note": "",
+        "createdAt": "2026-10-04T22:52:37.076Z"
+      }
+    ],
+    "5da80601-1e04-49fe-a985-4dcdc89eb5f2": [
+      {
+        "id": 3,
+        "taskId": "5da80601-1e04-49fe-a985-4dcdc89eb5f2",
+        "kind": "created",
+        "actor": "You",
+        "note": "",
+        "createdAt": "2026-10-04T22:52:37.076Z"
+      }
+    ],
+    "ff070ab3-0c1a-4608-b137-752271a56e44": [
+      {
+        "id": 4,
+        "taskId": "ff070ab3-0c1a-4608-b137-752271a56e44",
+        "kind": "created",
+        "actor": "You",
+        "note": "",
+        "createdAt": "2026-10-04T22:52:37.076Z"
+      }
+    ],
+    "540082ec-07aa-4556-9ff1-6830795d943f": [
+      {
+        "id": 6,
+        "taskId": "540082ec-07aa-4556-9ff1-6830795d943f",
+        "kind": "claimed",
+        "actor": "Storage chat",
+        "note": "",
+        "createdAt": "2026-10-04T22:52:37.077Z"
+      },
+      {
+        "id": 5,
+        "taskId": "540082ec-07aa-4556-9ff1-6830795d943f",
+        "kind": "created",
+        "actor": "You",
+        "note": "",
+        "createdAt": "2026-10-04T22:52:37.076Z"
+      }
+    ],
+    "2ea865e8-3bbc-4493-9bdb-bd85d1d36ff2": [
+      {
+        "id": 8,
+        "taskId": "2ea865e8-3bbc-4493-9bdb-bd85d1d36ff2",
+        "kind": "claimed",
+        "actor": "Interface chat",
+        "note": "",
+        "createdAt": "2026-10-04T22:52:37.077Z"
+      },
+      {
+        "id": 7,
+        "taskId": "2ea865e8-3bbc-4493-9bdb-bd85d1d36ff2",
+        "kind": "created",
+        "actor": "You",
+        "note": "",
+        "createdAt": "2026-10-04T22:52:37.077Z"
+      }
+    ],
+    "2c33d5ff-6b8c-4b1c-8994-b66f6813b274": [
+      {
+        "id": 11,
+        "taskId": "2c33d5ff-6b8c-4b1c-8994-b66f6813b274",
+        "kind": "submitted",
+        "actor": "Release chat",
+        "note": "Clean installation passed. Upgrade from dev.5 to dev.6 retained the saved task. All 36 packaged files verified.",
+        "createdAt": "2026-10-04T22:52:37.078Z"
+      },
+      {
+        "id": 10,
+        "taskId": "2c33d5ff-6b8c-4b1c-8994-b66f6813b274",
+        "kind": "claimed",
+        "actor": "Release chat",
+        "note": "",
+        "createdAt": "2026-10-04T22:52:37.078Z"
+      },
+      {
+        "id": 9,
+        "taskId": "2c33d5ff-6b8c-4b1c-8994-b66f6813b274",
+        "kind": "created",
+        "actor": "You",
+        "note": "",
+        "createdAt": "2026-10-04T22:52:37.077Z"
+      }
+    ],
+    "7a7b49f1-7316-4606-b5e3-897445d7b94a": [
+      {
+        "id": 14,
+        "taskId": "7a7b49f1-7316-4606-b5e3-897445d7b94a",
+        "kind": "submitted",
+        "actor": "Testing chat",
+        "note": "100 requests across independent processes produced one owner and 99 conflicts.",
+        "createdAt": "2026-10-04T22:52:37.079Z"
+      },
+      {
+        "id": 13,
+        "taskId": "7a7b49f1-7316-4606-b5e3-897445d7b94a",
+        "kind": "claimed",
+        "actor": "Testing chat",
+        "note": "",
+        "createdAt": "2026-10-04T22:52:37.078Z"
+      },
+      {
+        "id": 12,
+        "taskId": "7a7b49f1-7316-4606-b5e3-897445d7b94a",
+        "kind": "created",
+        "actor": "You",
+        "note": "",
+        "createdAt": "2026-10-04T22:52:37.078Z"
+      }
+    ],
+    "3bc4413d-87c4-4915-bd55-10d099610fea": [
+      {
+        "id": 18,
+        "taskId": "3bc4413d-87c4-4915-bd55-10d099610fea",
+        "kind": "accepted",
+        "actor": "You",
+        "note": "Moved to done",
+        "createdAt": "2026-10-04T22:52:37.079Z"
+      },
+      {
+        "id": 17,
+        "taskId": "3bc4413d-87c4-4915-bd55-10d099610fea",
+        "kind": "submitted",
+        "actor": "Performance chat",
+        "note": "Visible boards use a small revision check. Hidden panels pause; unchanged boards do not reload cards.",
+        "createdAt": "2026-10-04T22:52:37.079Z"
+      },
+      {
+        "id": 16,
+        "taskId": "3bc4413d-87c4-4915-bd55-10d099610fea",
+        "kind": "claimed",
+        "actor": "Performance chat",
+        "note": "",
+        "createdAt": "2026-10-04T22:52:37.079Z"
+      },
+      {
+        "id": 15,
+        "taskId": "3bc4413d-87c4-4915-bd55-10d099610fea",
+        "kind": "created",
+        "actor": "You",
+        "note": "",
+        "createdAt": "2026-10-04T22:52:37.079Z"
+      }
+    ],
+    "8c2077b8-0d7d-412f-8134-aae8e46ea8c9": [
+      {
+        "id": 19,
+        "taskId": "8c2077b8-0d7d-412f-8134-aae8e46ea8c9",
+        "kind": "created",
+        "actor": "You",
+        "note": "",
+        "createdAt": "2026-10-04T22:52:37.080Z"
+      }
+    ],
+    "e919ea3d-6434-432d-bb31-a404cb00160f": [
+      {
+        "id": 20,
+        "taskId": "e919ea3d-6434-432d-bb31-a404cb00160f",
+        "kind": "created",
+        "actor": "You",
+        "note": "",
+        "createdAt": "2026-10-04T22:52:37.080Z"
+      }
+    ],
+    "eb799a1c-95c4-48fe-abd1-1151d8c2ba72": [
+      {
+        "id": 21,
+        "taskId": "eb799a1c-95c4-48fe-abd1-1151d8c2ba72",
+        "kind": "created",
+        "actor": "You",
+        "note": "",
+        "createdAt": "2026-10-04T22:52:37.080Z"
+      }
+    ],
+    "dcedadc8-c1e0-47ef-9472-2fd16faf7ebf": [
+      {
+        "id": 22,
+        "taskId": "dcedadc8-c1e0-47ef-9472-2fd16faf7ebf",
+        "kind": "created",
+        "actor": "You",
+        "note": "",
+        "createdAt": "2026-10-04T22:52:37.082Z"
+      }
+    ]
+  },
+  "projectId": "23979a33-688a-4616-a53e-e7d756eba742",
+  "boardId": "b38a5ef6-2857-42f6-b6ef-8b0f8c8edadd"
+}

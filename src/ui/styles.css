@@ -6,7 +6,7 @@
   --canvas: var(--color-background-primary, #ffffff);
   --panel: var(--color-background-secondary, #f7f7f7);
   --text: var(--color-text-primary, #202020);
-  --muted: var(--color-text-secondary, #737373);
+  --muted: var(--color-text-secondary, #6b6b6b);
   --line: var(--color-border-secondary, #e8e8e8);
   --soft: var(--color-background-tertiary, #ededed);
   --inverse: var(--color-background-inverse, #202020);

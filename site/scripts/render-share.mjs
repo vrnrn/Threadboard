@@ -1,19 +1,33 @@
-import { chromium } from '@playwright/test';
-import { spawn } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
-const site = fileURLToPath(new URL('../', import.meta.url));
-const server = spawn(process.execPath, ['scripts/dev.mjs'], { cwd: site, env: { ...process.env, THREADBOARD_SITE_PORT: '4402' }, stdio: 'ignore' });
+import { chromium } from "@playwright/test";
+import { fileURLToPath } from "node:url";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+const site = fileURLToPath(new URL("../", import.meta.url));
 const browser = await chromium.launch();
 try {
-  for (let attempt = 0; attempt < 40; attempt++) {
-    try { if ((await fetch('http://127.0.0.1:4402/assets/share.svg')).ok) break; } catch {}
-    if (attempt === 39) throw new Error('Share graphic preview failed to start.');
-    await new Promise(resolve => setTimeout(resolve, 100));
-  }
-  const page = await browser.newPage({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 1 });
-  await page.goto('http://127.0.0.1:4402/assets/share.svg');
+  let svg = readFileSync(join(site, "src/assets/share.svg"), "utf8");
+  svg = svg.replace(/<\?xml[^>]*\?>\s*/g, "");
+  const font = readFileSync(
+    join(site, "dist/assets/instrument-sans-latin.woff2"),
+  ).toString("base64");
+  svg = svg.replace(
+    'href="board-dark.png"',
+    `href="data:image/png;base64,${readFileSync(join(site, "dist/assets/board-dark.png")).toString("base64")}"`,
+  );
+  const page = await browser.newPage({
+    viewport: { width: 1200, height: 630 },
+    deviceScaleFactor: 1,
+  });
+  await page.setContent(
+    `<html><head><style>@font-face{font-family:"Instrument Sans";font-style:normal;font-weight:400 700;src:url(data:font/woff2;base64,${font})}body{margin:0}svg{display:block}</style></head><body>${svg}</body></html>`,
+  );
   await page.evaluate(() => document.fonts.ready);
-  await page.locator('image').evaluate(async image => { const response = await fetch(image.getAttribute('href')); if (!response.ok) throw new Error('Board capture missing.'); });
-  await page.screenshot({ path: fileURLToPath(new URL('../src/assets/share.png', import.meta.url)) });
-  console.log('Rendered the 1200 × 630 Threadboard social image from its editable SVG and actual board capture.');
-} finally { await browser.close(); server.kill(); }
+  await page.screenshot({
+    path: fileURLToPath(new URL("../src/assets/share.png", import.meta.url)),
+  });
+  console.log(
+    "Rendered the 1200 × 630 Threadboard social image from its editable SVG and actual board capture.",
+  );
+} finally {
+  await browser.close();
+}

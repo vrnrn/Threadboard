@@ -17,12 +17,14 @@ function files(directory, prefix = '') {
 }
 const sums = Object.fromEntries(files(stage).sort().map(path => [path, createHash('sha256').update(readFileSync(join(stage, path))).digest('hex')]));
 writeFileSync(join(stage, 'MANIFEST.json'), JSON.stringify({ format: 'threadboard-release', version, files: sums }, null, 2) + '\n');
+const verified = spawnSync(process.execPath, [join(stage, 'install.mjs'),'--verify-only'], { encoding: 'utf8' });
+if (verified.status !== 0) throw new Error(verified.stderr);
+console.log(verified.stdout.trim());
+if (process.argv.includes('--stage-only')) process.exit(0);
 const zipPath = join(output, `${name}.zip`);
 rmSync(zipPath, { force: true });
 const zipped = spawnSync('zip', ['-X','-qr',zipPath,name], { cwd: output, encoding: 'utf8' });
 if (zipped.status !== 0) throw new Error(zipped.stderr || 'Install the zip utility to package a release.');
 const sha = createHash('sha256').update(readFileSync(zipPath)).digest('hex');
 writeFileSync(join(output, 'SHA256SUMS'), `${sha}  ${name}.zip\n`);
-const verified = spawnSync(process.execPath, [join(stage, 'install.mjs'),'--verify-only'], { encoding: 'utf8' });
-if (verified.status !== 0) throw new Error(verified.stderr);
-console.log(verified.stdout.trim()); console.log(`Packaged ${name}.zip (${(readFileSync(zipPath).length / 1024).toFixed(1)} KiB), with SHA256SUMS.`);
+console.log(`Packaged ${name}.zip (${(readFileSync(zipPath).length / 1024).toFixed(1)} KiB), with SHA256SUMS.`);
