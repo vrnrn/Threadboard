@@ -63,6 +63,33 @@ test('create, edit, note, move, archive and restore survive a reload', async ({ 
   } finally { w.cleanup(); }
 });
 
+test('closing a card while its saved change refreshes keeps it closed', async ({ page }) => {
+  const w = await workspace(page, 1);
+  const { task } = await api(page, 'create_task', { projectId: w.project.id, title: 'Close during refresh', operationId: randomUUID() });
+  await page.getByRole('button', { name: 'Refresh board', exact: true }).click();
+  await page.getByRole('button', { name: 'Close during refresh', exact: true }).click();
+  let release!: () => void, captured!: () => void;
+  const blocked = new Promise<void>(resolve => { release = resolve; });
+  const waiting = new Promise<void>(resolve => { captured = resolve; });
+  await page.route('**/api', async route => {
+    const body = route.request().postDataJSON();
+    if (body.name === 'get_task' && body.args.taskId === task.id) {
+      const response = await route.fetch(); captured(); await blocked;
+      await route.fulfill({ response });
+    } else await route.continue();
+  });
+  try {
+    await page.getByRole('dialog').getByRole('button', { name: 'Archive task', exact: true }).click();
+    await waiting;
+    await page.getByRole('button', { name: 'Close dialog', exact: true }).click();
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+  } finally { release(); }
+  await expect(page.getByRole('button', { name: 'Archive', exact: true })).toBeEnabled();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Archive', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Close during refresh', exact: true })).toBeVisible();
+});
+
 test('a conflicting save preserves the draft and can reload the latest content', async ({ page }) => {
   const w = await workspace(page, 2);
   try {

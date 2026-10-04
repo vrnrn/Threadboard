@@ -382,7 +382,12 @@ function Threadboard() {
       try {
         if (selectedProject.current === args.projectId && selectedBoard.current) {
           await load(args.projectId);
-          if (detail && detail.task.id === args.taskId) setDetail(await call('get_task', { projectId: args.projectId, taskId: args.taskId }));
+          if (detail && detail.task.id === args.taskId) {
+            const refreshed = await call<TaskDetail>('get_task', { projectId: args.projectId, taskId: args.taskId });
+            // A saved change must not reopen a dialog the user closed while its
+            // refresh was pending, or replace another card they opened.
+            setDetail(current => current?.task.id === args.taskId ? refreshed : current);
+          }
         }
         const catalogue = await call<ProjectCatalogue>('list_projects'); setProjects(catalogue.projects); setBoards(catalogue.boards);
       } catch {
