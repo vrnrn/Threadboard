@@ -3,7 +3,7 @@
 
 Plan work across your Codex projects, give each task a chat, and bring the result back for review. Threadboard keeps your boards on your device and opens inside Codex.
 
-**Current source preview: `0.1.4-dev.6`** · [Installation](#install-the-current-preview) · [User guide](docs/usage.md) · [Development](docs/development.md) · [MIT license](LICENSE)
+[Product page and preview download](https://threadboard.vrnrn.com/) · **Current source preview: `0.1.4-dev.6`** · [Installation](#install-the-current-preview) · [User guide](docs/usage.md) · [Development](docs/development.md) · [MIT license](LICENSE)
 
 <img src="docs/images/board-dark.png#gh-dark-mode-only" alt="Orbit's Product board, with tasks across Backlog, Ready, In progress, Review, and Done" width="1512">
 <img src="docs/images/board.png#gh-light-mode-only" alt="Orbit's Product board, with tasks across Backlog, Ready, In progress, Review, and Done" width="1512">

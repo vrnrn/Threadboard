@@ -1,0 +1,76 @@
+import { test, expect } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
+import { createHash } from 'node:crypto';
+test('dark is the default; theme choice and product images survive navigation', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.goto('/');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await expect(page.locator('[data-theme-image="board"]')).toHaveAttribute('src', '/assets/board-dark.png');
+  await page.getByRole('button', { name: 'Switch to light mode' }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await expect(page.locator('[data-theme-image="board"]')).toHaveAttribute('src', '/assets/board.png');
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await expect(page.getByRole('button', { name: 'Switch to dark mode' })).toBeVisible();
+  await page.getByRole('button', { name: 'Switch to dark mode' }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  expect(errors).toEqual([]);
+});
+test('the example handoff supports pointer and keyboard; screenshot dialog returns focus', async ({ page }) => {
+  await page.goto('/');
+  const ready = page.getByRole('tab', { name: /01 Ready/ });
+  await ready.focus();
+  await ready.press('ArrowRight');
+  await expect(page.locator('#example-state')).toHaveText('In progress');
+  await expect(page.locator('#example-update strong')).toContainText('Release chat owns');
+  await page.getByRole('tab', { name: /03 Review/ }).click();
+  await expect(page.locator('#example-state')).toHaveText('Review');
+  await expect(page.locator('#example-update p')).toContainText('36 packaged files');
+  await page.getByRole('tab', { name: /03 Review/ }).press('End');
+  await expect(page.locator('#example-state')).toHaveText('Done');
+  await expect(page.getByRole('tab', { name: /04 Done/ })).toBeFocused();
+  const trigger = page.getByRole('button', { name: 'Enlarge the actual task review screenshot' });
+  await trigger.click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await expect(page.locator('#large-image')).toHaveAttribute('src', '/assets/task-review-dark.png');
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog')).not.toBeVisible();
+  await expect(trigger).toBeFocused();
+});
+test('installation is actionable; the downloadable ZIP matches its checksum', async ({ page, request, context }) => {
+  await page.goto('/');
+  await page.getByRole('link', { name: 'Get Threadboard', exact: true }).first().click();
+  await expect(page.getByRole('heading', { name: 'Put a board behind the work.' })).toBeInViewport();
+  await page.getByRole('tab', { name: 'With the Codex CLI' }).click();
+  await expect(page.locator('#cli-instructions')).toBeVisible();
+  await expect(page.locator('#download-instructions')).not.toBeVisible();
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.getByRole('button', { name: 'Copy the Codex CLI commands' }).click();
+  await expect(page.getByRole('button', { name: 'Copied' })).toBeVisible();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('codex plugin marketplace add vrnrn/Threadboard --ref main\ncodex plugin add threadboard@threadboard-plugins');
+  const href = await page.getByRole('link', { name: /Download the preview/ }).getAttribute('href');
+  const zip = await request.get(href!); expect(zip.ok()).toBeTruthy();
+  const bytes = await zip.body(); expect(bytes.subarray(0, 2).toString()).toBe('PK');
+  const checksum = await request.get('/downloads/SHA256SUMS');
+  expect(await checksum.text()).toContain(createHash('sha256').update(bytes).digest('hex'));
+});
+for (const theme of ['dark', 'light']) test(`responsive layout and accessibility in ${theme} mode`, async ({ page }) => {
+  await page.goto('/');
+  if (theme === 'light') await page.getByRole('button', { name: 'Switch to light mode' }).click();
+  for (const width of [1440, 1024, 768, 390, 320]) {
+    await page.setViewportSize({ width, height: 900 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `Page overflow at ${width}px`).toBeTruthy();
+    await expect(page.getByRole('button', { name: `Switch to ${theme === 'dark' ? 'light' : 'dark'} mode` })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Get Threadboard', exact: true }).first()).toBeVisible();
+    const result = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
+    expect(result.violations.map(v => ({ id: v.id, nodes: v.nodes.map(n => n.target) })), `Accessibility at ${width}px`).toEqual([]);
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.locator('summary').filter({ hasText: 'What do I need?' }).click();
+  await expect(page.getByText('Codex desktop with plugin and MCP App support,', { exact: false })).toBeVisible();
+  await page.getByRole('button', { name: 'Enlarge the Product board screenshot' }).first().click();
+  const modal = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
+  expect(modal.violations.map(v => v.id)).toEqual([]);
+  await page.getByRole('button', { name: 'Close screenshot' }).click();
+});

@@ -11,3 +11,6 @@ release/
 .env
 .env.*
 coverage/
+site/dist/
+site/test-results/
+site/playwright-report/

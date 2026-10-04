@@ -18,11 +18,11 @@ export function seedDemo(store: Store, root: string) {
     ['Keep live updates lightweight', 'Check a small local revision while visible and reload cards only when the board changes.', 'done', 'normal', 'Performance chat'],
   ] as const;
   for (const [title, description, status, priority, owner] of cards) {
-    let task = store.createTask({ projectId: project.id, boardId: product.id, title, description, criteria: 'The result is clear, usable, and covered by the appropriate checks.', status: status === 'backlog' ? 'backlog' : 'ready', priority, operationId: randomUUID() });
+    let task = store.createTask({ projectId: project.id, boardId: product.id, title, description, criteria: title === 'Package a one-command installation' ? 'Package versions agree.\nA clean Codex profile opens the board.\nUpgrading preserves existing tasks.' : title === 'Verify atomic task ownership' ? '100 claim requests produce exactly one owner.\nOther claimants receive a conflict without changing the card.' : title === 'Keep live updates lightweight' ? 'Check only a local revision while visible.\nPause hidden panels.\nDo not refetch unchanged cards.' : 'Keep keyboard navigation working.\nVerify the changed behavior in the board.', status: status === 'backlog' ? 'backlog' : 'ready', priority, operationId: randomUUID() });
     if (['in_progress','review','done'].includes(status)) {
       const claim = store.claim({ projectId: project.id, taskId: task.id, version: task.version, owner, attemptId: randomUUID(), token: randomUUID() + randomUUID() });
       task = claim.task;
-      if (status !== 'in_progress') task = store.note({ projectId: project.id, taskId: task.id, runId: claim.run.id, token: claim.token, note: 'Implemented the planned behavior. Validation passed; ready for review.', submit: true }).task;
+      if (status !== 'in_progress') task = store.note({ projectId: project.id, taskId: task.id, runId: claim.run.id, token: claim.token, note: title === 'Package a one-command installation' ? 'Clean installation passed. Upgrade from dev.5 to dev.6 retained the saved task. All 36 packaged files verified.' : title === 'Verify atomic task ownership' ? '100 requests across independent processes produced one owner and 99 conflicts.' : 'Visible boards use a small revision check. Hidden panels pause; unchanged boards do not reload cards.', submit: true }).task;
       if (status === 'done') store.move({ projectId: project.id, taskId: task.id, version: task.version, status: 'done' });
     }
   }

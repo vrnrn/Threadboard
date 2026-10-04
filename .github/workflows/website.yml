@@ -1,0 +1,28 @@
+name: Website
+on:
+  push:
+    branches: [main]
+    paths: ['site/**', 'docs/images/**', 'plugins/threadboard/**', 'scripts/release.mjs', 'package.json', '.github/workflows/website.yml']
+  pull_request:
+    paths: ['site/**', 'docs/images/**', 'plugins/threadboard/**', 'scripts/release.mjs', 'package.json', '.github/workflows/website.yml']
+permissions:
+  contents: read
+concurrency:
+  group: threadboard-website-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: site
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: site/.node-version
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm test

@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>Threadboard — Many chats. One clear plan.</title>
+  <meta name="description" content="A local task board inside Codex. Give each card a goal, hand it to a chat, and bring the work back for review. Free, open source, and stored on your device.">
+  <link rel="canonical" href="https://threadboard.vrnrn.com/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Threadboard — Many chats. One clear plan.">
+  <meta property="og:description" content="Your Codex projects, a shared task board, and a clear path from a brief to your review. All on your device.">
+  <meta property="og:url" content="https://threadboard.vrnrn.com/">
+  <meta property="og:image" content="https://threadboard.vrnrn.com/assets/share.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#19171b">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/assets/instrument-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <script id="initial-theme">try{const t=localStorage.getItem('threadboard-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch{}</script>
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/main.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <svg class="svg-definitions" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><defs>
+    <symbol id="mark" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M8 7v10M12 7v6M16 7v8"/></symbol>
+    <symbol id="arrow" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6"/></symbol>
+    <symbol id="arrow-up" viewBox="0 0 24 24"><path d="M6 18 18 6M6 6h12v12"/></symbol>
+    <symbol id="check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.4 1.4m11.2 11.2L19 19M5 19l1.4-1.4M17.6 6.4 19 5"/></symbol>
+    <symbol id="moon" viewBox="0 0 24 24"><path d="M20 14.2A8.5 8.5 0 0 1 9.8 4 8.5 8.5 0 1 0 20 14.2Z"/></symbol>
+    <symbol id="download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/></symbol>
+    <symbol id="folder" viewBox="0 0 24 24"><path d="M3 7V4h6l3 3h9v13H3V7Z"/></symbol>
+    <symbol id="copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M15 8V4H4v11h4"/></symbol>
+    <symbol id="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  </defs></svg>
+  <header class="site-header wrap">
+    <a class="wordmark" href="/" aria-label="Threadboard home"><svg class="icon brand-mark"><use href="#mark"/></svg>Threadboard<span class="preview-label">PREVIEW</span></a>
+    <nav aria-label="Main navigation"><a href="#how-it-works">The workflow</a><a href="#local">On your device</a><a href="https://github.com/vrnrn/Threadboard" class="source-link">Source <svg class="icon"><use href="#arrow-up"/></svg></a></nav>
+    <div class="header-actions"><button class="theme-toggle" type="button" aria-label="Switch to light mode" title="Switch to light mode"><svg class="icon light-icon"><use href="#sun"/></svg><svg class="icon dark-icon"><use href="#moon"/></svg></button><a class="button small primary" href="#install" aria-label="Get Threadboard"><span class="header-button-label">Get Threadboard</span> <svg class="icon"><use href="#arrow"/></svg></a></div>
+  </header>
+  <main id="main">
+    <section class="hero wrap" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="status-dot"></span> A local board. Inside Codex.</p>
+        <h1 id="hero-title">Many chats.<br>One clear <span class="ink-underline">plan.</span></h1>
+        <p class="hero-description">Give each card a goal, hand it to a chat, and bring the work back for review. Threadboard keeps the whole project in view.</p>
+        <div class="hero-actions"><a class="button primary" href="#install">Get Threadboard <svg class="icon"><use href="#arrow"/></svg></a><a class="text-link" href="#board">See the board <span aria-hidden="true">↓</span></a></div>
+        <p class="hero-facts">Open source <span>·</span> No board account <span>·</span> Stored locally</p>
+      </div>
+      <figure class="hero-illustration">
+        <svg viewBox="0 0 560 480" role="img" aria-labelledby="work-map-title work-map-description">
+          <title id="work-map-title">A brief, a chat, and a reviewed result stay connected</title><desc id="work-map-description">Three illustrated cards connected by a continuous line. The work moves from Ready to a chat owner and then to your review.</desc>
+          <defs><pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" class="map-dot"/></pattern><filter id="card-shadow" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000" flood-opacity=".13"/></filter></defs>
+          <rect x="15" y="20" width="530" height="430" fill="url(#dots)"/>
+          <path class="thread-path" d="M97 129C-6 192 20 348 143 374S331 455 444 371C564 282 477 146 380 194"/>
+          <circle cx="97" cy="129" r="6" class="thread-node"/><circle cx="444" cy="371" r="6" class="thread-node"/>
+          <g transform="translate(27 30) rotate(-9 126 92)" filter="url(#card-shadow)">
+            <rect x="5" y="6" width="248" height="182" rx="12" class="card-back"/><rect width="248" height="182" rx="12" class="card-face"/>
+            <text x="22" y="34" class="map-mono">01 / THE BRIEF</text><path d="M22 50h204" class="map-rule"/>
+            <text x="22" y="80" class="map-title">Ship the installer</text><text x="22" y="104" class="map-small">Clean install. Keep existing tasks.</text>
+            <rect x="22" y="130" width="64" height="27" rx="13.5" class="map-chip"/><circle cx="36" cy="143.5" r="3" class="chip-dot"/><text x="46" y="147" class="map-label">Ready</text>
+            <path d="M196 139h22m-6-6 6 6-6 6" class="map-arrow"/>
+          </g>
+          <g transform="translate(236 160) rotate(7 137 90)" filter="url(#card-shadow)">
+            <rect x="5" y="6" width="270" height="181" rx="12" class="card-back"/><rect width="270" height="181" rx="12" class="card-face"/>
+            <text x="22" y="34" class="map-mono">02 / ONE OWNER</text><path d="M22 50h226" class="map-rule"/>
+            <rect x="22" y="71" width="34" height="34" rx="10" class="chat-tile"/><path d="M30 80h17v12H36l-5 4v-4h-1Z" class="chat-mark"/>
+            <text x="68" y="84" class="map-title small-title">Release chat</text><text x="68" y="104" class="map-small">Checking the package…</text>
+            <rect x="22" y="131" width="103" height="27" rx="13.5" class="map-chip"/><circle cx="36" cy="144.5" r="3" class="chip-dot"/><text x="46" y="148" class="map-label">In progress</text><path d="M218 143h22m-6-6 6 6-6 6" class="map-arrow"/>
+          </g>
+          <g transform="translate(83 310) rotate(-3 131 61)" filter="url(#card-shadow)">
+            <rect x="4" y="5" width="269" height="122" rx="12" class="card-back"/><rect width="269" height="122" rx="12" class="review-face"/>
+            <text x="22" y="32" class="review-mono">03 / YOUR CALL</text><text x="22" y="61" class="review-title">Ready for review.</text>
+            <text x="22" y="85" class="review-small">The result, with its checks attached.</text>
+            <circle cx="230" cy="61" r="17" class="review-check-bg"/><path d="m222 61 5 5 10-11" class="review-check"/>
+          </g>
+          <text x="397" y="72" class="map-annotation" transform="rotate(6 397 72)">keep the thread</text><path d="M426 85c37 9 53 29 42 57m-5-10 5 10 8-8" class="annotation-line"/>
+        </svg>
+        <figcaption>A card carries the brief.<br>The chat carries the work.</figcaption>
+      </figure>
+    </section>
+    <section id="board" class="board-section wrap" aria-label="See Threadboard">
+      <div class="figure-topline"><span class="mono">01 — THE SHARED VIEW</span><span>Plan → Start a chat → Review</span></div>
+      <figure class="product-shot">
+        <div class="shot-label"><span><svg class="icon"><use href="#mark"/></svg> Orbit / Product</span><button type="button" class="zoom-button" data-open-image="board" aria-label="Enlarge the Product board screenshot"><svg class="icon"><use href="#plus"/></svg> Take a closer look</button></div>
+        <button class="image-button" type="button" data-open-image="board" aria-label="Enlarge the Product board screenshot"><img src="/assets/board-dark.png" data-theme-image="board" width="1512" height="982" fetchpriority="high" alt="The actual Threadboard Product board, with tasks in Backlog, Ready, In progress, Review, and Done. Two chats own in-progress cards; two results await review."></button>
+        <figcaption>Real Threadboard interface, shown with example projects.<span>Follows your Codex theme.</span></figcaption>
+      </figure>
+      <div class="board-notes"><p><span class="note-number">01</span><span><strong>Know what’s next.</strong> Goals, priorities, and prerequisites live on the card.</span></p><p><span class="note-number">02</span><span><strong>Know who has it.</strong> A claim gives one chat ownership of the task.</span></p><p><span class="note-number">03</span><span><strong>Know what came back.</strong> Results wait in Review until you make the call.</span></p></div>
+    </section>
+    <section id="how-it-works" class="workflow-section section-space wrap" aria-labelledby="workflow-title">
+      <div class="section-heading"><p class="eyebrow">THE HANDOFF, WITHOUT THE HUNT</p><h2 id="workflow-title">A task can outlive<br>the chat that started it.</h2><p>Keep the brief, the owner, and the result in one place. Here’s the path of one installation task.</p></div>
+      <div class="workflow-grid">
+        <div class="workflow-controls">
+          <div class="step-tabs" role="tablist" aria-label="Follow an example task">
+            <button type="button" role="tab" id="step-0" aria-controls="workflow-panel" aria-selected="true" data-step="0"><span class="step-index">01</span><span><strong>Ready</strong><small>Make the outcome clear.</small></span><svg class="icon"><use href="#arrow"/></svg></button>
+            <button type="button" role="tab" id="step-1" aria-controls="workflow-panel" aria-selected="false" tabindex="-1" data-step="1"><span class="step-index">02</span><span><strong>In progress</strong><small>Give one chat the work.</small></span><svg class="icon"><use href="#arrow"/></svg></button>
+            <button type="button" role="tab" id="step-2" aria-controls="workflow-panel" aria-selected="false" tabindex="-1" data-step="2"><span class="step-index">03</span><span><strong>Review</strong><small>Read the result and its checks.</small></span><svg class="icon"><use href="#arrow"/></svg></button>
+            <button type="button" role="tab" id="step-3" aria-controls="workflow-panel" aria-selected="false" tabindex="-1" data-step="3"><span class="step-index">04</span><span><strong>Done</strong><small>Accept it. Keep the record.</small></span><svg class="icon"><use href="#arrow"/></svg></button>
+          </div>
+          <p class="workflow-footnote">Start a new chat from a card, or ask an existing chat to pick it up. A new chat opens with a prepared prompt; send it to begin.</p>
+        </div>
+        <div class="example-stage" role="tabpanel" id="workflow-panel" aria-labelledby="step-0" tabindex="0">
+          <div class="example-card"><div class="example-card-top"><span class="mono">TB-7 / PRODUCT</span><span class="task-state" id="example-state">Ready</span></div><h3>Package a one-command installation</h3><p class="example-brief">Bundle the board, local server, workflow skill, and licenses. An existing installation must keep its cards.</p><div class="criteria-block"><span class="mono">ACCEPTANCE CRITERIA</span><ul><li><svg class="icon"><use href="#check"/></svg> Package versions agree.</li><li><svg class="icon"><use href="#check"/></svg> A clean Codex profile opens the board.</li><li><svg class="icon"><use href="#check"/></svg> Upgrading preserves existing tasks.</li></ul></div><div class="example-update" id="example-update"><span class="update-indicator"></span><div><strong>No owner yet</strong><p>The brief is ready for a chat to pick up.</p></div></div></div>
+          <div class="stage-caption"><span class="caption-arrow" aria-hidden="true">↳</span><p id="stage-copy">The card keeps the outcome and acceptance criteria together, so the next chat starts with a useful brief.</p></div>
+          <span class="example-label mono">ILLUSTRATED HANDOFF / EXAMPLE TASK</span>
+        </div>
+      </div>
+    </section>
+    <section class="review-section section-space" aria-labelledby="review-title"><div class="wrap review-grid">
+      <div class="review-image"><div class="corner-label mono">THE RESULT HAS A HOME</div><button class="image-button" type="button" data-open-image="task-review" aria-label="Enlarge the actual task review screenshot"><img src="/assets/task-review-dark.png" data-theme-image="task-review" width="940" height="938" loading="lazy" alt="An actual task review dialog: an installation goal, acceptance criteria, Release chat ownership, validation notes, and Accept into Done and Request changes controls."></button><span class="image-stamp">Your review<br>is a real step.</span></div>
+      <div class="review-copy"><p class="eyebrow">A FINISHED CHAT ISN’T THE FINISH LINE</p><h2 id="review-title">Read the result.<br>Make the call.</h2><p>A chat submits its work with a short progress note and the checks it ran. You can see the brief and the result together.</p><div class="decision-row"><span class="decision yes"><svg class="icon"><use href="#check"/></svg> Accept into Done</span><span class="decision">↩ Request changes</span></div><p class="subtle">Threadboard moves on deliberate task updates. It doesn’t read your conversation history or guess whether a chat is finished.</p><a class="text-link" href="https://github.com/vrnrn/Threadboard/blob/main/docs/usage.md">Read the workflow guide <svg class="icon"><use href="#arrow-up"/></svg></a></div>
+    </div></section>
+    <section class="projects-section section-space wrap" aria-labelledby="projects-title"><div class="projects-heading"><div><p class="eyebrow">PROJECT FIRST, BOARD SECOND</p><h2 id="projects-title">Your projects.<br>Room for every kind of work.</h2></div><p>Threadboard uses the projects you already created in Codex. Each gets an empty General board. Add Product, Release, or a board for the next thing you want to ship.</p></div>
+      <div class="projects-layout"><figure class="overview-shot"><button class="image-button" type="button" data-open-image="overview" aria-label="Enlarge the Your boards overview screenshot"><img src="/assets/overview-dark.png" data-theme-image="overview" width="1512" height="982" loading="lazy" alt="The actual Your boards overview groups six boards under Atlas, Orbit, and Website. Orbit has General, Product, and Release boards."></button><figcaption>One overview. Multiple boards per project.</figcaption></figure><div class="project-map"><div class="map-project"><svg class="icon"><use href="#folder"/></svg><span>Orbit</span><small>CODEX PROJECT</small></div><div class="map-boards"><span><svg class="icon"><use href="#mark"/></svg> General <small>Start here</small></span><span class="highlight"><svg class="icon"><use href="#mark"/></svg> Product <small>Features & fixes</small></span><span><svg class="icon"><use href="#mark"/></svg> Release <small>Ready to ship</small></span></div><p>Separate boards.<br>The same project context.</p><span class="sketch-arrow" aria-hidden="true">↖</span></div></div>
+    </section>
+    <section id="local" class="local-section section-space" aria-labelledby="local-title"><div class="wrap"><div class="local-heading"><p class="eyebrow">SMALL FOOTPRINT. CLEAR BOUNDARIES.</p><h2 id="local-title">The board lives<br>on your machine.</h2><p>No hosted board service. No board account. Your tasks live in a local SQLite database, separate from the replaceable plugin files.</p></div>
+      <figure class="local-diagram"><div class="device-boundary"><span class="boundary-label mono"><span class="status-dot"></span> YOUR DEVICE</span><div class="diagram-node codex-node"><div class="node-glyph"><svg class="icon"><use href="#folder"/></svg></div><strong>Codex</strong><span>Your projects & chats</span></div><div class="diagram-connector"><span>task tools</span><svg viewBox="0 0 120 28" aria-hidden="true"><path d="M3 14h110m-7-6 7 6-7 6"/></svg></div><div class="diagram-node board-node"><div class="node-glyph"><svg class="icon"><use href="#mark"/></svg></div><strong>Threadboard</strong><span>Local MCP server</span></div><div class="diagram-connector"><span>read / write</span><svg viewBox="0 0 120 28" aria-hidden="true"><path d="M3 14h110m-7-6 7 6-7 6"/></svg></div><div class="diagram-node data-node"><div class="database-glyph" aria-hidden="true"><span></span><span></span><span></span></div><strong>Your boards</strong><span>SQLite on disk</span></div></div><figcaption>Threadboard stores task content, chat references, and deliberate updates. It does not open transcript files. Task information you choose to use in a chat still goes through your normal Codex account and model service.</figcaption></figure>
+      <div class="local-details"><div><span class="detail-icon">↻</span><h3>Changes without the churn.</h3><p>A visible board checks a small local revision once a second. Cards reload after a change. Hidden panels pause, and open drafts stay open.</p></div><div><span class="detail-icon">↗</span><h3>Your work survives updates.</h3><p>Plugin files and task data have separate homes. Export a readable JSON snapshot, or back up the database to keep a restorable copy.</p></div><div><span class="detail-icon">⌘</span><h3>Built for your workspace.</h3><p>Use the keyboard, work in a narrow panel, and follow your Codex theme. Threadboard stays beside the chats doing the work.</p></div></div>
+    </div></section>
+    <section class="faq-section section-space wrap" aria-labelledby="faq-title"><div><p class="eyebrow">BEFORE YOU INSTALL</p><h2 id="faq-title">A few good questions.</h2><p class="faq-intro">Threadboard is an open-source preview. Here’s what it does today.</p></div><div class="faq-list">
+      <details><summary>What do I need?<svg class="icon"><use href="#plus"/></svg></summary><p>Codex desktop with plugin and MCP App support, the Codex CLI, and Node.js 22.13 or newer. The package includes the compiled app, so you don’t need npm or a build step to use it.</p></details>
+      <details><summary>Will a card start a chat automatically?<svg class="icon"><use href="#plus"/></svg></summary><p><strong>Start in new chat</strong> opens Codex with a prepared task prompt. Send it to begin. You can also ask an existing chat to claim a card. A claim gives one chat ownership; it does not quietly dispatch model turns in the background.</p></details>
+      <details><summary>What gets sent to a server?<svg class="icon"><use href="#plus"/></svg></summary><p>Threadboard has no hosted backend and doesn’t sync boards or transcripts. When you ask Codex to work on a task, that task context uses your normal Codex model service and allowance. Local storage doesn’t make the model run offline.</p></details>
+      <details><summary>Can I use it across multiple computers?<svg class="icon"><use href="#plus"/></svg></summary><p>The current preview is for one device. It has local exports and database backups; it has no account or cross-device synchronization.</p></details>
+      <details><summary>How ready is the preview?<svg class="icon"><use href="#plus"/></svg></summary><p>Board opening has been confirmed in Codex. Backend, browser, performance, and installation checks run in CI. Native chat placement and full-view navigation recovery are still experimental. <a href="https://github.com/vrnrn/Threadboard/blob/main/RELEASE_NOTES.md">Read the current release notes.</a></p></details>
+      <details><summary>Does it cost anything?<svg class="icon"><use href="#plus"/></svg></summary><p>Threadboard is free and MIT licensed, with no board subscription or hosted backend to pay for. Task work still uses your existing Codex account and model allowance.</p></details>
+    </div></section>
+    <section id="install" class="install-section" aria-labelledby="install-title"><div class="wrap install-grid"><div class="install-copy"><p class="eyebrow">MAKE ROOM FOR YOUR NEXT TASK</p><h2 id="install-title">Put a board<br>behind the work.</h2><p>Install the preview. Open Threadboard in Codex. Your projects are already waiting.</p><a class="button download-button" href="/downloads/threadboard-__VERSION__.zip" download><svg class="icon"><use href="#download"/></svg> Download the preview <span>__SIZE__ MB</span></a><p class="download-meta">v__VERSION__ · Node.js 22.13+ · Codex CLI</p><a class="checksum-link" href="/downloads/SHA256SUMS">Verify the checksum <span aria-hidden="true">↗</span></a></div><div class="install-instructions"><div class="install-tabs" role="tablist" aria-label="Installation method"><button type="button" role="tab" id="method-download" aria-controls="download-instructions" aria-selected="true" data-install="download">From the download</button><button type="button" role="tab" id="method-cli" aria-controls="cli-instructions" aria-selected="false" tabindex="-1" data-install="cli">With the Codex CLI</button></div><div class="install-panel" id="download-instructions" role="tabpanel" aria-labelledby="method-download"><ol><li><span>01</span><p>Extract the ZIP and open a terminal in that folder.</p></li><li><span>02</span><div><p>Run the installer.</p><div class="code-line"><code>node install.mjs</code><button type="button" data-copy="node install.mjs" aria-label="Copy the installer command"><svg class="icon"><use href="#copy"/></svg></button></div></div></li><li><span>03</span><p>Fully quit and reopen Codex. Open <strong>Threadboard</strong> from the sidebar.</p></li></ol></div><div class="install-panel" id="cli-instructions" role="tabpanel" aria-labelledby="method-cli" hidden><p>Add the repository marketplace and install the plugin.</p><div class="code-block"><code>codex plugin marketplace add vrnrn/Threadboard --ref main<br>codex plugin add threadboard@threadboard-plugins</code><button type="button" data-copy="codex plugin marketplace add vrnrn/Threadboard --ref main&#10;codex plugin add threadboard@threadboard-plugins" aria-label="Copy the Codex CLI commands"><svg class="icon"><use href="#copy"/></svg></button></div><p>Fully quit and reopen Codex, then open <strong>Threadboard</strong> from the sidebar.</p></div><p class="install-help">Already have boards? The installer keeps your task data. <a href="https://github.com/vrnrn/Threadboard/blob/main/docs/usage.md">User guide ↗</a></p></div></div></section>
+    <section class="open-source-section wrap"><svg class="icon"><use href="#mark"/></svg><div><h2>Built in the open.</h2><p>Read the code, try the preview, or help decide what comes next.</p></div><a class="text-link" href="https://github.com/vrnrn/Threadboard">Explore the repository <svg class="icon"><use href="#arrow-up"/></svg></a></section>
+  </main>
+  <footer class="site-footer wrap"><a class="wordmark" href="/"><svg class="icon brand-mark"><use href="#mark"/></svg>Threadboard</a><span>A project by <a href="https://vrnrn.com/">vrnrn</a></span><nav aria-label="Footer navigation"><a href="https://github.com/vrnrn/Threadboard/blob/main/PRIVACY.md">Privacy</a><a href="https://github.com/vrnrn/Threadboard/blob/main/LICENSE">MIT license</a><a href="https://github.com/vrnrn/Threadboard/issues">Feedback</a></nav><p>Independent software for Codex. Not affiliated with OpenAI.</p></footer>
+  <dialog class="image-dialog" aria-label="Product screenshot"><div class="image-dialog-bar"><span id="image-dialog-title">Threadboard</span><button type="button" data-close-image aria-label="Close screenshot">Close <span aria-hidden="true">×</span></button></div><div class="image-dialog-scroll" tabindex="0" role="region" aria-label="Scroll to explore the screenshot"><img id="large-image" width="1512" height="982" alt=""></div><div class="image-dialog-bottom"><span>Actual interface / example projects</span><a id="full-image-link" href="/assets/board-dark.png" target="_blank" rel="noopener">Open original ↗</a></div></dialog>
+  <div id="announcement" class="visually-hidden" role="status" aria-live="polite"></div>
+</body>
+</html>
