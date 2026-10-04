@@ -1,16 +1,12 @@
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/images/cover-dark.svg">
-  <img src="docs/images/cover.svg" alt="Threadboard — Give every task a home. Local boards for your Codex projects." width="1200">
-</picture>
+<img src="docs/images/cover-dark.svg#gh-dark-mode-only" alt="Threadboard — Give every task a home. Local boards for your Codex projects." width="1200">
+<img src="docs/images/cover.svg#gh-light-mode-only" alt="Threadboard — Give every task a home. Local boards for your Codex projects." width="1200">
 
 Plan work across your Codex projects, give each task a chat, and bring the result back for review. Threadboard keeps your boards on your device and opens inside Codex.
 
 **Current source preview: `0.1.4-dev.6`** · [Installation](#install-the-current-preview) · [User guide](docs/usage.md) · [Development](docs/development.md) · [MIT license](LICENSE)
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/images/board-dark.png">
-  <img src="docs/images/board.png" alt="Orbit's Product board, with tasks across Backlog, Ready, In progress, Review, and Done" width="1512">
-</picture>
+<img src="docs/images/board-dark.png#gh-dark-mode-only" alt="Orbit's Product board, with tasks across Backlog, Ready, In progress, Review, and Done" width="1512">
+<img src="docs/images/board.png#gh-light-mode-only" alt="Orbit's Product board, with tasks across Backlog, Ready, In progress, Review, and Done" width="1512">
 
 ## From plan to review
 
@@ -25,8 +21,8 @@ Task content stays in a local SQLite database. The plugin uses a bundled stdio M
 
 <table>
   <tr>
-    <td width="50%"><strong>Every project, every board</strong><br><br><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/overview-dark.png"><img src="docs/images/overview.png" alt="The Your boards overview groups General, Product, Release, and Editorial boards by project"></picture></td>
-    <td width="50%"><strong>Review the work, then move it forward</strong><br><br><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/task-review-dark.png"><img src="docs/images/task-review.png" alt="A task in Review with its goal, acceptance criteria, owner notes, and explicit acceptance controls"></picture></td>
+    <td width="50%"><strong>Every project, every board</strong><br><br><img src="docs/images/overview-dark.png#gh-dark-mode-only" alt="The Your boards overview groups General, Product, Release, and Editorial boards by project"><img src="docs/images/overview.png#gh-light-mode-only" alt="The Your boards overview groups General, Product, Release, and Editorial boards by project"></td>
+    <td width="50%"><strong>Review the work, then move it forward</strong><br><br><img src="docs/images/task-review-dark.png#gh-dark-mode-only" alt="A task in Review with its goal, acceptance criteria, owner notes, and explicit acceptance controls"><img src="docs/images/task-review.png#gh-light-mode-only" alt="A task in Review with its goal, acceptance criteria, owner notes, and explicit acceptance controls"></td>
   </tr>
 </table>
 
@@ -51,7 +47,7 @@ Download its ZIP, extract it, and run `node install.mjs`. The installer discover
 
 ## A few useful details
 
-A new card chat opens with a prefilled prompt: **send it to begin**. Creating a named board can also request a companion chat named “<board name> Threadboard” through Codex's native project-aware tools. Threadboard stores the chat reference and deliberate task state, without reading conversation history.
+A new card chat opens with a prefilled prompt: **send it to begin**. Creating a named board can also request a companion chat named `<board name> Threadboard` through Codex's native project-aware tools. Threadboard stores the chat reference and deliberate task state, without reading conversation history.
 
 If Codex leaves the board in a split pane after Back, **Open full view** beside Refresh requests the sidebar app and carries the selected project, board, and archive view. Codex owns its navigation and pane layout; this new recovery control still needs native-host verification.
 

@@ -28,4 +28,4 @@ This first builds the compiled UI, seeds temporary native project metadata and t
 
 The screenshot fixtures show Orbit with General, Product, and Release boards; Atlas with an empty General board; and Website with General and Editorial. Product includes nine example cards across all five states. Release and Editorial demonstrate independent task counts. Every fixture is discarded when its preview server exits.
 
-Use the SVG files as the editable brand sources. Keep product captures separate from the plugin's runtime assets: documentation graphics are not loaded by the board. The generated social PNG is ready for repository social-preview settings or sharing.
+README images use [GitHub theme markers](https://github.blog/changelog/2021-11-24-specify-theme-context-for-images-in-markdown/) so they follow the reader’s selected GitHub appearance. Use the SVG files as the editable brand sources. Keep product captures separate from the plugin's runtime assets: documentation graphics are not loaded by the board. The generated social PNG is ready for repository social-preview settings or sharing.
