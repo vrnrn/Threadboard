@@ -21,8 +21,8 @@ Task content stays in a local SQLite database. The plugin uses a bundled stdio M
 
 <table>
   <tr>
-    <td width="50%"><strong>Every project, every board</strong><br><br><img src="docs/images/overview-dark.png#gh-dark-mode-only" alt="The Your boards overview groups General, Product, Release, and Editorial boards by project"><img src="docs/images/overview.png#gh-light-mode-only" alt="The Your boards overview groups General, Product, Release, and Editorial boards by project"></td>
-    <td width="50%"><strong>Review the work, then move it forward</strong><br><br><img src="docs/images/task-review-dark.png#gh-dark-mode-only" alt="A task in Review with its goal, acceptance criteria, owner notes, and explicit acceptance controls"><img src="docs/images/task-review.png#gh-light-mode-only" alt="A task in Review with its goal, acceptance criteria, owner notes, and explicit acceptance controls"></td>
+    <td width="50%" valign="top"><strong>Every project, every board</strong><br><br><img src="docs/images/overview-dark.png#gh-dark-mode-only" alt="The Your boards overview groups General, Product, Release, and Editorial boards by project"><img src="docs/images/overview.png#gh-light-mode-only" alt="The Your boards overview groups General, Product, Release, and Editorial boards by project"></td>
+    <td width="50%" valign="top"><strong>Review, then move forward</strong><br><br><img src="docs/images/task-review-dark.png#gh-dark-mode-only" alt="A task in Review with its goal, acceptance criteria, owner notes, and explicit acceptance controls"><img src="docs/images/task-review.png#gh-light-mode-only" alt="A task in Review with its goal, acceptance criteria, owner notes, and explicit acceptance controls"></td>
   </tr>
 </table>
 
