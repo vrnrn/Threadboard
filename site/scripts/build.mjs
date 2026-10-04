@@ -2,6 +2,7 @@ import {
   cpSync,
   mkdirSync,
   readFileSync,
+  readdirSync,
   rmSync,
   writeFileSync,
 } from "node:fs";
@@ -170,6 +171,23 @@ writeFileSync(
   join(output, "404.html"),
   '<!doctype html><html lang="en" data-theme="dark"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Page not found — Threadboard</title><link rel="stylesheet" href="/styles.css"><main class="wrap section-space"><p class="eyebrow">404 / PAGE NOT FOUND</p><h1>Let’s get you back to the board.</h1><p class="hero-description">This page isn’t here. The product page has the preview and installation guide.</p><div class="hero-actions"><a class="button primary" href="/">Back to Threadboard</a></div></main></html>',
 );
+// Keep returning visitors from combining new HTML with cached scripts or art.
+const assetFiles = [
+  "index.html", "404.html", "demo/index.html",
+  "styles.css", "main.js", "demo/app.js", "demo/app.css", "demo/demo.css",
+  ...readdirSync(join(output, "assets")).sort().map(name => `assets/${name}`),
+];
+const assetHash = createHash("sha256");
+for (const file of assetFiles) assetHash.update(file).update(readFileSync(join(output, file)));
+const assetVersion = assetHash.digest("hex").slice(0, 12);
+for (const file of ["index.html", "404.html", "demo/index.html", "styles.css"]) {
+  const content = readFileSync(join(output, file), "utf8")
+    .replace("<html ", `<html data-asset-version="${assetVersion}" `)
+    .replaceAll('"/demo/"', `"/demo/?v=${assetVersion}"`)
+    .replace(/\/(?:styles\.css|main\.js|assets\/[\w.-]+|demo\/(?:app\.(?:css|js)|demo\.css))(?=["')])/g,
+      path => `${path}?v=${assetVersion}`);
+  writeFileSync(join(output, file), content);
+}
 writeFileSync(
   join(output, "build.json"),
   JSON.stringify({

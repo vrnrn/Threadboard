@@ -20,4 +20,6 @@ Cloudflare Pages project: `threadboard-web`. GitHub source: `vrnrn/Threadboard`,
 
 Download and checksum URLs include the package content hash. This keeps cached preview downloads matched to their checksum even when two source builds share a preview version.
 
+Styles, scripts, demo pages, and product images carry a build content hash in their URLs. Returning visitors receive the matching assets after a deployment, including when switching themes or resetting the demo.
+
 The website is independent of Threadboard's fully local runtime. Hosting the page and downloadable installer does not introduce board synchronization or a hosted MCP server.
