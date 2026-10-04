@@ -15,6 +15,7 @@ const css = ui.outputFiles.find(f => f.path.endsWith('.css'))?.text || '';
 const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><title>Threadboard</title><style>${css}</style></head><body><div id="root"></div><script>${js}</script></body></html>`;
 await writeFile(new URL('board.html', output), html);
 const server = await build({ entryPoints: [fileURLToPath(new URL('src/server.ts', root))], bundle: true, minify: true,
+  loader: { '.svg': 'text' },
   outfile: fileURLToPath(new URL('server.mjs', output)), platform: 'node', format: 'esm', target: 'node22',
   banner: { js: 'import { createRequire as __createRequire } from "node:module"; const require = __createRequire(import.meta.url);' }, legalComments: 'inline', metafile: true });
 const packages = new Set();

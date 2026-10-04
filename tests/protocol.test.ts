@@ -31,6 +31,15 @@ test('compiled release initializes over stdio, serves its UI, and retains task d
     assert.equal(tools.tools.some(t => t.name === 'create_project'), false);
     for (const tool of tools.tools) assert.equal(tool.inputSchema.additionalProperties, false);
     const open = tools.tools.find(t => t.name === 'open_project_board')!;
+    assert.deepEqual(open.icons?.map(icon => icon.theme), ['light', 'dark']);
+    assert.deepEqual(client.getServerVersion()?.icons, open.icons);
+    for (const icon of open.icons!) {
+      assert.equal(icon.mimeType, 'image/svg+xml');
+      assert.ok(icon.src.startsWith('data:image/svg+xml;base64,'), 'Sidebar icons must work offline.');
+      const asset = readFileSync(new URL(`../plugins/threadboard/assets/icon${icon.theme === 'dark' ? '-dark' : ''}.svg`, import.meta.url), 'utf8');
+      assert.equal(Buffer.from(icon.src.split(',')[1], 'base64').toString('utf8'), asset);
+      assert.ok(asset.includes('viewBox="0 0 64 64"'));
+    }
     assert.deepEqual((open._meta?.['openai/ui'] as any).entrypoints, [{type:'global'},{type:'thread'}]);
     const uri = open._meta?.['ui/resourceUri'] as string;
     assert.ok(uri.startsWith(`ui://threadboard/board/${VERSION}/`));

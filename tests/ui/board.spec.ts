@@ -87,7 +87,7 @@ test('closing a card while its saved change refreshes keeps it closed', async ({
   await expect(page.getByRole('button', { name: 'Archive', exact: true })).toBeEnabled();
   await expect(page.getByRole('dialog')).toHaveCount(0);
   await page.getByRole('button', { name: 'Archive', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Close during refresh', exact: true })).toBeVisible();
+  await expect(page.getByTestId(`task-${task.number}`).getByRole('button', { name: 'Close during refresh', exact: true })).toBeVisible();
 });
 
 test('a conflicting save preserves the draft and can reload the latest content', async ({ page }) => {

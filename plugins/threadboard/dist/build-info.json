@@ -1,6 +1,6 @@
 {
-  "version": "0.1.4-dev.6",
-  "uiGzipBytes": 153367,
+  "version": "0.1.4-dev.7",
+  "uiGzipBytes": 153368,
   "htmlBytes": 609378,
   "runtime": "Node >=22.13"
 }

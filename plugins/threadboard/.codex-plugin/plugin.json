@@ -1,6 +1,6 @@
 {
   "name": "threadboard",
-  "version": "0.1.4-dev.6",
+  "version": "0.1.4-dev.7",
   "description": "A fully local Kanban board inside Codex. Create tasks, coordinate chats, and review completed work without a hosted service.",
   "author": {
     "name": "Threadboard contributors"
@@ -24,7 +24,9 @@
     "privacyPolicyURL": "https://github.com/vrnrn/Threadboard/blob/main/PRIVACY.md",
     "termsOfServiceURL": "https://github.com/vrnrn/Threadboard/blob/main/LICENSE",
     "composerIcon": "./assets/icon.svg",
+    "composerIconDark": "./assets/icon-dark.svg",
     "logo": "./assets/logo.svg",
+    "logoDark": "./assets/logo-dark.svg",
     "brandColor": "#808080"
   }
 }

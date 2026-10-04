@@ -86,7 +86,10 @@ test("installation is actionable; the downloadable ZIP matches its checksum", as
   expect(zip.ok()).toBeTruthy();
   const bytes = await zip.body();
   expect(bytes.subarray(0, 2).toString()).toBe("PK");
-  const checksum = await request.get("/downloads/SHA256SUMS");
+  const checksumHref = await page
+    .getByRole("link", { name: "Verify the checksum", exact: true })
+    .getAttribute("href");
+  const checksum = await request.get(checksumHref!);
   expect(await checksum.text()).toContain(
     createHash("sha256").update(bytes).digest("hex"),
   );

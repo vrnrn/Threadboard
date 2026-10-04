@@ -1,6 +1,7 @@
 import { McpServer, ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { ErrorCode, McpError } from '@modelcontextprotocol/sdk/types.js';
+import { ErrorCode, McpError, ListToolsRequestSchema, ToolSchema, type Icon, type Tool } from '@modelcontextprotocol/sdk/types.js';
+import { toJsonSchemaCompat } from '@modelcontextprotocol/sdk/server/zod-json-schema-compat.js';
 import { registerAppResource, RESOURCE_MIME_TYPE, RESOURCE_URI_META_KEY } from '@modelcontextprotocol/ext-apps/server';
 import type { OpenAIUiResourceMetadata, OpenAIUiToolMetadata } from '@openai/mcp-extensions/server';
 import { readFileSync } from 'node:fs';
@@ -11,10 +12,18 @@ import { definitions, invoke, type ToolName } from './api.js';
 import { Store } from './store.js';
 import { BoardError } from './types.js';
 import { VERSION } from './version.js';
+import lightIcon from '../plugins/threadboard/assets/icon.svg';
+import darkIcon from '../plugins/threadboard/assets/icon-dark.svg';
 
 process.umask(0o077);
 const store = new Store();
-const server = new McpServer({ name: 'threadboard', version: VERSION });
+// Sidebar app entries use the opening tool's icons. Package listing icons alone
+// do not brand that entry; inline both themes to keep discovery fully local.
+const icons: Icon[] = (['light', 'dark'] as const).map(theme => ({
+  src: `data:image/svg+xml;base64,${Buffer.from(theme === 'dark' ? darkIcon : lightIcon).toString('base64')}`,
+  mimeType: 'image/svg+xml', sizes: ['any'], theme,
+}));
+const server = new McpServer({ name: 'threadboard', version: VERSION, icons });
 const html = readFileSync(fileURLToPath(new URL('./board.html', import.meta.url)), 'utf8');
 // Changed UI content gets a new resource identity, including local preview rebuilds.
 const uri = `ui://threadboard/board/${VERSION}/${createHash('sha256').update(html).digest('hex').slice(0, 16)}`;
@@ -46,17 +55,23 @@ function modelData(name: string, data: any): Record<string, unknown> {
     tasks: data.tasks.map((t: any) => ({ id: t.id, boardId: t.boardId, number: t.number, title: t.title, status: t.status, priority: t.priority, version: t.version, owner: t.run?.owner || null })) };
   return data;
 }
+const discoveryTools: Tool[] = [];
 for (const name of Object.keys(definitions) as ToolName[]) {
   const def = definitions[name];
   const config = {
     title: def.title, description: def.description, inputSchema: def.schema,
     annotations: { readOnlyHint: def.readOnly, destructiveHint: false, idempotentHint: def.readOnly || ['create_board','prepare_board_chat','bind_board_chat','create_task','claim_task','prepare_task_launch','bind_task_run'].includes(name), openWorldHint: false },
-    ...(name === 'open_project_board' ? { _meta: {
+    ...(name === 'open_project_board' ? { icons, _meta: {
       ui: { resourceUri: uri, visibility: ['app','model'] as ('app'|'model')[] },
       [RESOURCE_URI_META_KEY]: uri,
       'openai/ui': toolMetadata,
     } } : { _meta: { ui: { visibility: (name === 'get_board_revision' ? ['app'] : ['app','model']) as ('app'|'model')[] } } }),
   };
+  const { inputSchema, ...metadata } = config;
+  discoveryTools.push(ToolSchema.parse({ name, ...metadata,
+    inputSchema: toJsonSchemaCompat(inputSchema, { strictUnions: true, pipeStrategy: 'input' }),
+    execution: { taskSupport: 'forbidden' },
+  }));
   const handler = async (args: any) => {
     try {
       const data = invoke(store, name, args);
@@ -70,6 +85,10 @@ for (const name of Object.keys(definitions) as ToolName[]) {
   };
   server.registerTool(name, config, handler);
 }
+// SDK 1.32's high-level discovery omits icons. Publish the same validated
+// catalogue with icons through its public handler API; tool dispatch and input
+// validation still belong to McpServer.
+server.server.setRequestHandler(ListToolsRequestSchema, () => ({ tools: discoveryTools }));
 
 const transport = new StdioServerTransport();
 await server.connect(transport);

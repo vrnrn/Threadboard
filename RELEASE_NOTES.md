@@ -1,5 +1,13 @@
 # Release notes
 
+## Current source and website preview — 0.1.4-dev.7
+
+The three-line Threadboard icon now appears in the package's light and dark assets and in MCP server/tool discovery for the sidebar app. The icon is embedded locally and needs no remote asset. Close Threadboard and fully quit and reopen Codex after updating so the host reloads discovery metadata.
+
+Closing a card during a saved change's refresh keeps the dialog closed. The product site's hero runs the actual app UI with example tasks in browser memory, including editable cards, drag and drop, boards, filters, and a simulated chat handoff. Download and checksum URLs include the package hash so preview builds cannot reuse mismatched cached downloads.
+
+The website offers this preview at [threadboard.vrnrn.com](https://threadboard.vrnrn.com/). The GitHub release remains `0.1.1`; no universal-directory submission is implied. Native sidebar icon rendering after a host restart remains a separate check.
+
 ## Current source preview — 0.1.4-dev.6
 
 The source preview uses native Codex projects, supports multiple boards within each project, and reflects explicit task updates from other chats automatically. The latest downloadable GitHub package remains `0.1.1`; these changes do not create a new release or imply an OpenAI directory listing.

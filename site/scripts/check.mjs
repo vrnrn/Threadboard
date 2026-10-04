@@ -11,7 +11,10 @@ assert.ok(
   html.includes('data-theme="dark"'),
   "First visits must default to dark.",
 );
-assert.ok(!/__VERSION__|__SIZE__/.test(html), "Unresolved build placeholder.");
+assert.ok(
+  !/__VERSION__|__SIZE__|__DOWNLOAD__|__CHECKSUM__/.test(html),
+  "Unresolved build placeholder.",
+);
 const ids = new Set(
   [...html.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]),
 );
@@ -39,6 +42,14 @@ assert.ok(
   readFileSync(join(output, "downloads/SHA256SUMS"), "utf8").includes(
     metadata.sha256,
   ),
+);
+assert.equal(
+  metadata.download,
+  `threadboard-${metadata.version}-${metadata.sha256.slice(0, 12)}.zip`,
+);
+assert.equal(
+  readFileSync(join(output, "downloads", metadata.checksum), "utf8"),
+  `${metadata.sha256}  ${metadata.download}\n`,
 );
 assert.ok(
   html.includes("https://threadboard.vrnrn.com/"),

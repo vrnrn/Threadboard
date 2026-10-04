@@ -16,4 +16,6 @@ Build output is `site/dist/`. The build copies the current real UI captures from
 
 Cloudflare Pages project: `threadboard-web`. GitHub source: `vrnrn/Threadboard`, production branch `main`, root `site`, build command `npm run verify`, output `dist`, Node 24. Public domain: `threadboard.vrnrn.com`. Only deployment and linking configuration in the other projects was used; this page has its own design and assets.
 
+Download and checksum URLs include the package content hash. This keeps cached preview downloads matched to their checksum even when two source builds share a preview version.
+
 The website is independent of Threadboard's fully local runtime. Hosting the page and downloadable installer does not introduce board synchronization or a hosted MCP server.

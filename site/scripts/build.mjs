@@ -40,10 +40,15 @@ const entries = Object.fromEntries(
     ]),
 );
 const packageBytes = zipSync(entries, { level: 6 });
+const packageHash = createHash("sha256").update(packageBytes).digest("hex");
+// Preview builds can change without a version bump. Give each download and its
+// checksum matching content-specific URLs so caches cannot mix two builds.
+const downloadName = `threadboard-${version}-${packageHash.slice(0, 12)}.zip`;
+const checksumName = `${downloadName}.sha256`;
 writeFileSync(join(root, "release", packageName), packageBytes);
 writeFileSync(
   join(root, "release/SHA256SUMS"),
-  `${createHash("sha256").update(packageBytes).digest("hex")}  ${packageName}\n`,
+  `${packageHash}  ${packageName}\n`,
 );
 rmSync(output, { recursive: true, force: true });
 mkdirSync(join(output, "assets"), { recursive: true });
@@ -111,11 +116,15 @@ cpSync(
 );
 cpSync(
   join(root, "release", packageName),
-  join(output, "downloads", packageName),
+  join(output, "downloads", downloadName),
 );
-cpSync(join(root, "release/SHA256SUMS"), join(output, "downloads/SHA256SUMS"));
+const publicChecksum = `${packageHash}  ${downloadName}\n`;
+writeFileSync(join(output, "downloads", checksumName), publicChecksum);
+writeFileSync(join(output, "downloads/SHA256SUMS"), publicChecksum);
 let html = readFileSync(join(site, "src/index.html"), "utf8")
   .replaceAll("__VERSION__", version)
+  .replaceAll("__DOWNLOAD__", downloadName)
+  .replaceAll("__CHECKSUM__", checksumName)
   .replaceAll("__SIZE__", (packageBytes.length / 1024 / 1024).toFixed(1));
 const structured = {
   "@context": "https://schema.org",
@@ -127,7 +136,7 @@ const structured = {
   operatingSystem: "Codex desktop",
   softwareVersion: version,
   url: "https://threadboard.vrnrn.com/",
-  downloadUrl: `https://threadboard.vrnrn.com/downloads/${packageName}`,
+  downloadUrl: `https://threadboard.vrnrn.com/downloads/${downloadName}`,
   license: "https://github.com/vrnrn/Threadboard/blob/main/LICENSE",
   offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
 };
@@ -166,8 +175,9 @@ writeFileSync(
   JSON.stringify({
     version,
     commit: process.env.CF_PAGES_COMMIT_SHA || process.env.GITHUB_SHA || null,
-    download: packageName,
-    sha256: createHash("sha256").update(packageBytes).digest("hex"),
+    download: downloadName,
+    checksum: checksumName,
+    sha256: packageHash,
   }) + "\n",
 );
 console.log(
