@@ -1,5 +1,5 @@
 import { build } from 'esbuild';
-import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';
@@ -31,8 +31,11 @@ for (const name of [...packages].sort()) {
   const folder = fileURLToPath(new URL(`node_modules/${name}/`, root));
   const pkg = JSON.parse(await readFile(join(folder, 'package.json'), 'utf8'));
   notices += `\n## ${name} ${pkg.version}\n\nLicense: ${pkg.license || 'See license text'}\n`;
+  const filenames = new Set(await readdir(folder));
   let found = false;
   for (const filename of ['LICENSE','LICENSE.md','LICENSE.txt','LICENSE-MIT','LICENSE-MIT.txt','license','license.md','license.txt','NOTICE','NOTICE.txt']) {
+    // Read only actual directory entries, even on case-insensitive filesystems.
+    if (!filenames.has(filename)) continue;
     try { const license = await readFile(join(folder, filename), 'utf8'); notices += `\n### ${filename}\n\n\`\`\`text\n${license.trim()}\n\`\`\`\n`; if (filename.toUpperCase().startsWith('LICENSE')) found = true; }
     catch (error) { if (error.code !== 'ENOENT') throw error; }
   }

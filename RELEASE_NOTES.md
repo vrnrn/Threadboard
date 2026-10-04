@@ -2,6 +2,8 @@
 
 ## Unreleased — 0.1.4-dev.8
 
+- Collect each dependency license once on both case-sensitive and case-insensitive filesystems.
+
 - Delayed task reads no longer replace a newer card or reopen a closed dialog. Manual refresh preserves loaded pages, and pagination retries when the board changes between reads.
 - Moving or reordering a task within its current column preserves its prepared chat. Launch binding rechecks blockers and prerequisites. Review cards consistently show their most recent submission.
 - Dialogs make background controls inactive. Task shortcuts respect modifier keys, and cancelling a drag resumes live updates.

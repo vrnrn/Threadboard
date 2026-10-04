@@ -20,7 +20,8 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run build
-      - run: git diff --exit-code -- plugins/threadboard/dist THIRD_PARTY_NOTICES.md
+      # Gzip byte counts in build-info vary with Node's zlib version.
+      - run: git diff --exit-code -- plugins/threadboard/dist THIRD_PARTY_NOTICES.md ':(exclude)plugins/threadboard/dist/build-info.json'
       - run: npm test
       - run: npx playwright install --with-deps chromium
       - run: npm run test:ui
